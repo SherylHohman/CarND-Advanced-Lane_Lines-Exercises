@@ -31551,6 +31551,9 @@ GhoaGhoaGhoaGhoaGhoaGhoargnaQlVDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0NDQ0PDNcH/D3aQd3NW
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="o">%</span><span class="k">matplotlib</span> qt
 
+<span class="c1"># Chessboard has 8 inner corners across</span>
+<span class="c1">#                6 inner corners vertical</span>
+
 <span class="c1"># prepare object points, like (0,0,0), (1,0,0), (2,0,0) ....,(6,5,0)</span>
 <span class="n">objp</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">6</span><span class="o">*</span><span class="mi">8</span><span class="p">,</span><span class="mi">3</span><span class="p">),</span> <span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
 <span class="n">objp</span><span class="p">[:,:</span><span class="mi">2</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">6</span><span class="p">]</span><span class="o">.</span><span class="n">T</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span><span class="mi">2</span><span class="p">)</span>
