@@ -3,12 +3,23 @@
 
 # ### Combining Thresholds
 
-# In[9]:
+# In[1]:
 
 get_ipython().magic('matplotlib inline')
 
 
-# In[17]:
+# In[2]:
+
+"""     
+NOTE: To Fine Tune Lane Line Detection For Image:  
+      change the values in the section labeled  
+    `'# CHANGE THESE VALUES TO FINE LANE LINE DETECTION FOR IMAGE'`  
+      (at the time of this writing, it's at line #48 - this may change over time)
+"""
+''
+
+
+# In[3]:
 
 import numpy as np
 import cv2
@@ -26,10 +37,10 @@ def abs_sobel_thresh(gray, orient='x', sobel_kernel=3, thresh=(0, 255)):
     scaled = np.uint8(255 * abs_sobel/np.max(abs_sobel))
     # Apply threshold
     grad_binary = np.zeros_like(gray)
-    grad_binary[(sobel >= thresh[0]) & (sobel <= thresh[1]) ] = 1
+    grad_binary[(scaled >= thresh[0]) & (scaled <= thresh[1]) ] = 1
     return grad_binary
 
-def mag_thresh(gray, sobel_kernel=3, mag_thresh=(0, 255)):
+def magnitude_threshold(gray, sobel_kernel=3, mag_thresh=(0, 255)):
     # Calculate gradient magnitude
     sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
     sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
@@ -40,7 +51,7 @@ def mag_thresh(gray, sobel_kernel=3, mag_thresh=(0, 255)):
     mag_binary[ (scaled >= mag_thresh[0]) & scaled <= mag_thresh[1] ] = 1
     return mag_binary
 
-def dir_threshold(gray, sobel_kernel=3, thresh=(0, np.pi/2)):
+def direction_threshold(gray, sobel_kernel=3, thresh=(0, np.pi/2)):
     # Calculate gradient direction
     sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
     sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
@@ -57,15 +68,19 @@ image_color = mpimg.imread('signs_vehicles_xygrad.png')
 image_gray  = cv2.cvtColor(image_color, cv2.COLOR_RGB2GRAY)
 
 
+# CHANGE THESE VALUES TO FINE LANE LINE DETECTION FOR IMAGE
 # Choose a Sobel kernel size
-ksize = 3 # Choose a larger odd number to smooth gradient measurements
-
+ksize = 11 # Choose a larger odd number to smooth gradient measurements
+gradx_thresh  = (15, 100)  # values in range: (0,255)
+grady_thresh  = (15, 100)  # values in range: (0,255)
+mag_thresh    = (30, 100)  # values in range: (0,255)
+dir_thresh    = (0.7,1.4)  # values in range: (0,np.pi/2)
 
 # Apply each of the thresholding functions
-gradx = abs_sobel_thresh(  image_gray, orient='x', sobel_kernel=ksize, thresh=    (0, 255)) #(0,255)
-grady = abs_sobel_thresh(  image_gray, orient='y', sobel_kernel=ksize, thresh=    (0, 255)) #(0,255)
-mag_binary = mag_thresh(   image_gray,             sobel_kernel=ksize, mag_thresh=(5, 200)) #(0,255)
-dir_binary = dir_threshold(image_gray,             sobel_kernel=ksize, thresh=(0.7, 1.3)) #(0, np.pi/2)
+gradx = abs_sobel_thresh(  image_gray, orient='x', sobel_kernel=ksize, thresh=gradx_thresh)    #(0,255)
+grady = abs_sobel_thresh(  image_gray, orient='y', sobel_kernel=ksize, thresh=grady_thresh)    #(0,255)
+mag_binary = magnitude_threshold(image_gray,       sobel_kernel=ksize, mag_thresh=mag_thresh)  #(0,255)
+dir_binary = direction_threshold(image_gray,       sobel_kernel=ksize, thresh=dir_thresh) #(0, np.pi/2)
 
 combined = np.zeros_like(dir_binary)
 combined[((gradx == 1) & (grady == 1)) | ((mag_binary == 1) & (dir_binary == 1))] = 1
@@ -78,10 +93,23 @@ f.tight_layout()
 ax1.imshow(image_color)
 ax1.set_title('Original Image', fontsize=50)
 
+# ax2.imshow(gradx, cmap='gray')
 ax2.imshow(combined, cmap='gray')
 ax2.set_title('Combined Thresholds', fontsize=50)
 
 plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
+
+settings = '_k-'+str(ksize)   +            '_x-'+str(gradx_thresh[0])+'-'+str(gradx_thresh[1]) +            '_y-'+str(grady_thresh[0])+'-'+str(grady_thresh[1]) +            '_m-'+str(mag_thresh[0])  +'-'+str(mag_thresh[1])   +            '_d-'+str(dir_thresh[0])  +'-'+str(dir_thresh[1])
+            
+combined_filename = 'l24-my-outputs-from-combining-thresholds/l24_combined'+settings+'.png'
+
+# TODO: correct format of saved files: grayscale looks like purple and yellow.
+mpimg.imsave(combined_filename, combined)
+# # convert from GRAY to BGR before saving with cv2.imwrite
+# combined_color = cv2.cvtColor(combined, cv2.COLOR_GRAY2BGR)
+# cv2.imwrite(combined_filename, combined_color)
+
+print('Full-Size Combined Thresholds image saved as: \n' + combined_filename)
 
 
 # In[ ]:
