@@ -4,6 +4,9 @@
 # ### L21: Applying Sobel:
 # #### My Solution
 
+# NOTE: The output Image Output from my Solution Looks Terrible!   It is Correcton the online quiz.  
+# Likely, it's because I do not have the correct source file. I did a Snipping Tool screenshot.
+
 # In[1]:
 
 # for local notebook, as oppsoed to running online
@@ -22,6 +25,9 @@ import pickle
 # Read in an image and grayscale it
 image = mpimg.imread('signs_vehicles_xygrad.png')
 
+# **NOTE**: image was read in using mpimg: use RGB conversion, NOT BGR conversion
+
+
 # Define a function that applies Sobel x or y, 
 # then takes an absolute value and applies a threshold.
 # Note: calling your function with orient='x', thresh_min=5, thresh_max=100
@@ -31,49 +37,41 @@ def abs_sobel_thresh(img, orient='x', thresh_min=0, thresh_max=255):
     
     # Apply the following steps to img
     # 1) Sobel requires a grayscale image.
-    gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    
+    # **NOTE**: image was read in using **mpimg**: use RGB conversion, NOT BGR conversion
+    gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     
     # 2) Take the derivative in x or y given orient = 'x' or 'y'
-    sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0)  # 1, 0 = x dir = vertical emphasis
-    sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1)  # 0, 1 = y dir = horizontal emphasis
+    if   (orient == 'x'):
+        sobel = cv2.Sobel(gray, cv2.CV_64F, 1, 0)  # 1, 0 = x dir = vertical emphasis
+    elif (orient == 'y'):
+        sobel = cv2.Sobel(gray, cv2.CV_64F, 0, 1)  # 0, 1 = y dir = horizontal emphasis
+    else:
+        print("error: orient must be 'x' or 'y'")
     
     # 3) Take the absolute value of the derivative or gradient
-    abs_sobelx = np.absolute(sobelx)
-    abs_sobely = np.absolute(sobely)
+    abs_sobel = np.absolute(sobel)
     
     # 4) Scale to 8-bit (0 - 255) then convert to type = np.uint8
-    scaled_abs_sobelx = np.uint8(255 * abs_sobelx/np.max(abs_sobelx))
-    scaled_abs_sobely = np.uint8(255 * abs_sobely/np.max(abs_sobely))
+    scaled_abs_sobel = np.uint8(255.0 * abs_sobel/np.max(abs_sobel))
     
     # 5) Create a mask of 1's where the scaled gradient magnitude 
             # is > thresh_min and < thresh_max
-    threshold_min =   5 #5 #20
-    threshold_max = 100
     
     # init binary image: create a black "zeroed out" image
-    sx_binary = np.zeros_like(scaled_abs_sobelx)
-    sy_binary = np.zeros_like(scaled_abs_sobely)
+    binary_output = np.zeros_like(scaled_abs_sobel)
     
-    # create binary image: set==1 the pixels from scaled sobel which are within threshold values
-    sx_binary[ (scaled_abs_sobelx >= threshold_min) & (scaled_abs_sobelx <= threshold_max)] = 1
-    sy_binary[ (scaled_abs_sobely >= threshold_min) & (scaled_abs_sobely <= threshold_max)] = 1
+    # create binary image: set==1: the pixels from scaled sobel which are within threshold values
+    binary_output[ (scaled_abs_sobel > thresh_min) & (scaled_abs_sobel < thresh_max)] = 1
         
     # 6) Return this mask as your binary_output image
-    #  binary_output = np.copy(img) # Remove this line
-    #  return binary_output
-        
-    if orient == 'x':
-        print('returning sobelx binary..')
-        return sx_binary
-    elif orient == 'y':
-        print('returning sobely binary..')
-        return sy_binary
-    else:
-        print('orientation must be "x" or "y"; returning grayscale')
-        return gray
+    print('returning sobel', orient, 'binary with thresholds:', thresh_min, thresh_max)
+    
+    return binary_output
+    
     
 # Run the function
-grad_binary = abs_sobel_thresh(image, orient='x', thresh_min=20, thresh_max=100)
+grad_binary = abs_sobel_thresh(image, orient='x', thresh_min=15, thresh_max=100)
 
 # Plot the result
 f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
@@ -87,6 +85,12 @@ ax2.set_title('Thresholded Gradient', fontsize=50)
 
 plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 
+
+# ABOVE: The Image Output from my Solution Looks Terrible!  It is Correcton the online quiz.
+# Likely, it's because I do not have the correct source file. I did a Snipping Tool screenshot.
+# Here is the output from online quiz. Note that thresh_min=5 has more lines than the example image.  
+# When I set thresh_min == 20, I get an image like the example.
+# <img src='l21-my-output-of-abs-sobel-thresh.png' />
 
 # In[ ]:
 
