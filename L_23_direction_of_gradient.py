@@ -2,15 +2,16 @@
 # coding: utf-8
 
 # ### L_23 Direction of Gradient
-# 
+# ##### my output image when run online:
+# <img src='l23-my-output-of-dir-threshold.png' />
 # #### My Solution
 
-# In[ ]:
+# In[1]:
 
 get_ipython().magic('matplotlib inline')
 
 
-# In[ ]:
+# In[2]:
 
 import numpy as np
 import cv2
@@ -32,21 +33,23 @@ def dir_threshold(img, sobel_kernel=3, thresh=(0, np.pi/2)):
     gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
     
     # 2) Take the gradient in x and y separately
-    sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=sobel_kernal)
-    sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=sobel_kernal)
+    sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0, ksize=sobel_kernel)
+    sobely = cv2.Sobel(gray, cv2.CV_64F, 0, 1, ksize=sobel_kernel)
     
     # 3) Take the absolute value of the x and y gradients
-    abs = np.sqrt(np.square(sobelx)+np.square(sobely))
+    # abs = np.sqrt(np.square(sobelx)+np.square(sobely))
+    absx = np.absolute(sobelx)
+    absy = np.absolute(sobely)
     
     # 4) Use np.arctan2(abs_sobely, abs_sobelx) to calculate the direction of the gradient
-    
-    
+    direction = np.arctan2(absy, absx)
+
     # 5) Create a binary mask where direction thresholds are met
     binary_output = np.zeros_like(gray)
-    binary_output[ ((scaled>=thresh[0]) & (scaled<=thresh[1])) ] = 1
+    binary_output[ ((direction >= thresh[0]) & (direction <= thresh[1])) ] = 1
     
     # 6) Return this mask as your binary_output image
-    binary_output = np.copy(img) # Remove this line
+    # binary_output = np.copy(img) # Remove this line
     return binary_output
     
 # Run the function
@@ -65,7 +68,10 @@ ax2.set_title('Thresholded Grad. Dir.', fontsize=50)
 plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 
 
-# In[1]:
+# #### This is my output file when run online:  
+# <img src='l23-my-output-of-dir-threshold.png' />
+
+# In[3]:
 
 #### Read Me - Instructions
 
