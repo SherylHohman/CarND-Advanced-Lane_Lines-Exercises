@@ -11778,16 +11778,33 @@ div#notebook {
 <span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
 <span class="kn">import</span> <span class="nn">matplotlib.image</span> <span class="k">as</span> <span class="nn">mpimg</span>
 
-
 <span class="n">image</span> <span class="o">=</span> <span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;bridge_shadow.jpg&#39;</span><span class="p">)</span>
 
+
 <span class="c1"># Edit this function to create your own pipeline.</span>
-<span class="k">def</span> <span class="nf">pipeline</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">s_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">170</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">sx_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+ 
+<span class="k">def</span> <span class="nf">pipeline</span><span class="p">(</span><span class="n">orig_image</span><span class="p">,</span> <span class="n">s_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">170</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">sx_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
+<span class="c1"># def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):</span>
+
+    <span class="c1">#     ## !! LINE BELOW :: HOW DOES DEEP COPYING TO ITSELF HELP ??!!</span>
+    <span class="c1">#     ## WHAT AM I MISSING HERE ?</span>
+    <span class="c1">#     img = np.copy(img)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     # SHOULD IT NOT BE: ??</span>
+    <span class="c1">#     img_copy = np.copy(img) </span>
+    <span class="c1">#    </span>
+    <span class="c1">#  -SH</span>
+    
+    <span class="c1"># SH:  changed name of passed in image to &quot;orig_image&quot; in function definition.  </span>
+    <span class="c1"># Now I can make a copy:</span>
+    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">orig_image</span><span class="p">)</span>
+    
+    
     <span class="c1"># Convert to HSV color space and separate the V channel</span>
     <span class="n">hsv</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2HLS</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
     <span class="n">l_channel</span> <span class="o">=</span> <span class="n">hsv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">s_channel</span> <span class="o">=</span> <span class="n">hsv</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span>
+    
     <span class="c1"># Sobel x</span>
     <span class="n">sobelx</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">Sobel</span><span class="p">(</span><span class="n">l_channel</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_64F</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># Take the derivative in x</span>
     <span class="n">abs_sobelx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">sobelx</span><span class="p">)</span> <span class="c1"># Absolute x derivative to accentuate lines away from horizontal</span>
@@ -11800,10 +11817,12 @@ div#notebook {
     <span class="c1"># Threshold color channel</span>
     <span class="n">s_binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">s_channel</span><span class="p">)</span>
     <span class="n">s_binary</span><span class="p">[(</span><span class="n">s_channel</span> <span class="o">&gt;=</span> <span class="n">s_thresh</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">s_channel</span> <span class="o">&lt;=</span> <span class="n">s_thresh</span><span class="p">[</span><span class="mi">1</span><span class="p">])]</span> <span class="o">=</span> <span class="mi">1</span>
+    
     <span class="c1"># Stack each channel</span>
-    <span class="c1"># Note color_binary[:, :, 0] is all 0s, effectively an all black image. It might</span>
-    <span class="c1"># be beneficial to replace this channel with something else.</span>
+    <span class="c1"># Note color_binary[:, :, 0] is all 0s, effectively an all black image. </span>
+    <span class="c1"># It might be beneficial to replace this channel with something else.</span>
     <span class="n">color_binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">sxbinary</span><span class="p">),</span> <span class="n">sxbinary</span><span class="p">,</span> <span class="n">s_binary</span><span class="p">))</span>
+    
     <span class="k">return</span> <span class="n">color_binary</span>
     
 <span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
@@ -12028,9 +12047,21 @@ with the goal <strong>using the pipeline you come up with for your upcoming proj
 
 <span class="n">image</span> <span class="o">=</span> <span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;bridge_shadow.jpg&#39;</span><span class="p">)</span>
 
+
 <span class="c1"># Edit this function to create your own pipeline.</span>
 <span class="k">def</span> <span class="nf">pipeline</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">s_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">170</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">sx_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
+
+    <span class="c1">#     ## !! LINE BELOW :: HOW DOES DEEP COPYING TO ITSELF HELP ??!!</span>
+    <span class="c1">#     ## WHAT AM I MISSING HERE ?</span>
+    <span class="c1">#     img = np.copy(img)</span>
+    <span class="c1">#</span>
+    <span class="c1">#     # SHOULD IT NOT BE: ??</span>
+    <span class="c1">#     img_copy = np.copy(img) </span>
+    <span class="c1">#    </span>
+    <span class="c1"># -SH</span>
+
     <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+    
     <span class="c1"># Convert to HSV color space and separate the V channel</span>
     <span class="n">hsv</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2HLS</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
     <span class="n">l_channel</span> <span class="o">=</span> <span class="n">hsv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span>
