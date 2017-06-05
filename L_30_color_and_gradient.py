@@ -60,13 +60,16 @@ plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 # # Color and Gradient  
 # Now it's time to combine what you know about color and gradient thresholding to get the best of both worlds. Here's an example of how that might look:  
 # Combined color and gradient thresholds for lane detection.  
-# <img src='' />  
+# 
+# <img src='l30-combine-channel-and-gradient-thresholds.png' />  
+# 
 # Combined color and gradient thresholds for lane detection.  
 # At this point, it's okay to detect edges around trees or cars because these lines can be mostly filtered out by applying a mask to the image and essentially cropping out the area outside of the lane lines. It's most important that you reliably detect different colors of lane lines under varying degrees of daylight and shadow.  
 # 
 # You can clearly see which parts of the lane lines were detected by the gradient threshold and which parts were detected by the color threshold by stacking the channels and seeing the individual components. You can create a binary combination of these two images to map out where either the color or gradient thresholds were met.  
 # Here's what that looks like in code:  
 # 
+# ```
 # # Convert to HLS color space and separate the S channel  
 # # Note: img is the undistorted image  
 # hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)  
@@ -75,6 +78,7 @@ plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 # # Grayscale image  
 # # NOTE: we already saw that standard grayscaling lost color information for the lane lines  
 # # Explore gradients in other colors spaces / color channels to see what might work better  
+# 
 # gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)  
 # 
 # # Sobel x  
@@ -108,9 +112,14 @@ plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 # ax1.imshow(color_binary)  
 # 
 # ax2.set_title('Combined S channel and gradient thresholds')  
-# ax2.imshow(combined_binary, cmap='gray')  
+# ax2.imshow(combined_binary, cmap='gray') 
+# ```
+# 
 # The output is shown below. The final image color_binary is a combination of binary thresholding the S channel (HLS) and binary thresholding the result of applying the Sobel operator in the x direction on the original image.  
 # (Left) Stacked image; the green is the gradient threshold component and the blue is the color channel threshold component.  
+# 
+# <img src='l30-channel-plus-gradient-thresholds-stacked-and-combined.png' />  
+# 
 # (Right) black and white combined thresholded image - this one has combined both gradient and color thresholds into one image.  
 # (Left) Stacked image; the green is the gradient threshold component and the blue is the color channel threshold component. (Right) black and white combined thresholded image - this one has combined both gradient and color thresholds into one image.  
 # In this next exercise, you'll get the chance to play around with different combinations of color and gradient with the goal using the pipeline you come up with for your upcoming project. There's no correct submission, just explore!  

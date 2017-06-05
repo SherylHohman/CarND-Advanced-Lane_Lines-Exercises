@@ -11831,37 +11831,60 @@ div#notebook {
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
 <h1 id="Color-and-Gradient">Color and Gradient<a class="anchor-link" href="#Color-and-Gradient">&#182;</a></h1><p>Now it's time to combine what you know about color and gradient thresholding to get the best of both worlds. Here's an example of how that might look:<br>
-Combined color and gradient thresholds for lane detection.<br>
-<img src='' /><br>
-Combined color and gradient thresholds for lane detection.<br>
+Combined color and gradient thresholds for lane detection.</p>
+<p><img src='l30-combine-channel-and-gradient-thresholds.png' /></p>
+<p>Combined color and gradient thresholds for lane detection.<br>
 At this point, it's okay to detect edges around trees or cars because these lines can be mostly filtered out by applying a mask to the image and essentially cropping out the area outside of the lane lines. It's most important that you reliably detect different colors of lane lines under varying degrees of daylight and shadow.</p>
 <p>You can clearly see which parts of the lane lines were detected by the gradient threshold and which parts were detected by the color threshold by stacking the channels and seeing the individual components. You can create a binary combination of these two images to map out where either the color or gradient thresholds were met.<br>
 Here's what that looks like in code:</p>
-<h1 id="Convert-to-HLS-color-space-and-separate-the-S-channel">Convert to HLS color space and separate the S channel<a class="anchor-link" href="#Convert-to-HLS-color-space-and-separate-the-S-channel">&#182;</a></h1><h1 id="Note:-img-is-the-undistorted-image">Note: img is the undistorted image<a class="anchor-link" href="#Note:-img-is-the-undistorted-image">&#182;</a></h1><p>hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)<br>
-s_channel = hls[:,:,2]</p>
-<h1 id="Grayscale-image">Grayscale image<a class="anchor-link" href="#Grayscale-image">&#182;</a></h1><h1 id="NOTE:-we-already-saw-that-standard-grayscaling-lost-color-information-for-the-lane-lines">NOTE: we already saw that standard grayscaling lost color information for the lane lines<a class="anchor-link" href="#NOTE:-we-already-saw-that-standard-grayscaling-lost-color-information-for-the-lane-lines">&#182;</a></h1><h1 id="Explore-gradients-in-other-colors-spaces-/-color-channels-to-see-what-might-work-better">Explore gradients in other colors spaces / color channels to see what might work better<a class="anchor-link" href="#Explore-gradients-in-other-colors-spaces-/-color-channels-to-see-what-might-work-better">&#182;</a></h1><p>gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)</p>
-<h1 id="Sobel-x">Sobel x<a class="anchor-link" href="#Sobel-x">&#182;</a></h1><p>sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0) # Take the derivative in x<br>
-abs_sobelx = np.absolute(sobelx) # Absolute x derivative to accentuate lines away from horizontal<br>
-scaled_sobel = np.uint8(255*abs_sobelx/np.max(abs_sobelx))</p>
-<h1 id="Threshold-x-gradient">Threshold x gradient<a class="anchor-link" href="#Threshold-x-gradient">&#182;</a></h1><p>thresh_min = 20<br>
-thresh_max = 100<br>
-sxbinary = np.zeros_like(scaled_sobel)<br>
-sxbinary[(scaled_sobel &gt;= thresh_min) &amp; (scaled_sobel &lt;= thresh_max)] = 1</p>
-<h1 id="Threshold-color-channel">Threshold color channel<a class="anchor-link" href="#Threshold-color-channel">&#182;</a></h1><p>s_thresh_min = 170<br>
-s_thresh_max = 255<br>
-s_binary = np.zeros_like(s_channel)<br>
-s_binary[(s_channel &gt;= s_thresh_min) &amp; (s_channel &lt;= s_thresh_max)] = 1</p>
-<h1 id="Stack-each-channel-to-view-their-individual-contributions-in-green-and-blue-respectively">Stack each channel to view their individual contributions in green and blue respectively<a class="anchor-link" href="#Stack-each-channel-to-view-their-individual-contributions-in-green-and-blue-respectively">&#182;</a></h1><h1 id="This-returns-a-stack-of-the-two-binary-images,-whose-components-you-can-see-as-different-colors">This returns a stack of the two binary images, whose components you can see as different colors<a class="anchor-link" href="#This-returns-a-stack-of-the-two-binary-images,-whose-components-you-can-see-as-different-colors">&#182;</a></h1><p>color_binary = np.dstack(( np.zeros_like(sxbinary), sxbinary, s_binary))</p>
-<h1 id="Combine-the-two-binary-thresholds">Combine the two binary thresholds<a class="anchor-link" href="#Combine-the-two-binary-thresholds">&#182;</a></h1><p>combined_binary = np.zeros_like(sxbinary)<br>
-combined_binary[(s_binary == 1) | (sxbinary == 1)] = 1</p>
-<h1 id="Plotting-thresholded-images">Plotting thresholded images<a class="anchor-link" href="#Plotting-thresholded-images">&#182;</a></h1><p>f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))<br>
-ax1.set_title('Stacked thresholds')<br>
-ax1.imshow(color_binary)</p>
-<p>ax2.set_title('Combined S channel and gradient thresholds')<br>
-ax2.imshow(combined_binary, cmap='gray')<br>
-The output is shown below. The final image color_binary is a combination of binary thresholding the S channel (HLS) and binary thresholding the result of applying the Sobel operator in the x direction on the original image.<br>
-(Left) Stacked image; the green is the gradient threshold component and the blue is the color channel threshold component.<br>
-(Right) black and white combined thresholded image - this one has combined both gradient and color thresholds into one image.<br>
+
+<pre><code># Convert to HLS color space and separate the S channel  
+# Note: img is the undistorted image  
+hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)  
+s_channel = hls[:,:,2]  
+
+# Grayscale image  
+# NOTE: we already saw that standard grayscaling lost color information for the lane lines  
+# Explore gradients in other colors spaces / color channels to see what might work better  
+
+gray = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)  
+
+# Sobel x  
+sobelx = cv2.Sobel(gray, cv2.CV_64F, 1, 0) # Take the derivative in x  
+abs_sobelx = np.absolute(sobelx) # Absolute x derivative to accentuate lines away from horizontal  
+scaled_sobel = np.uint8(255*abs_sobelx/np.max(abs_sobelx))  
+
+# Threshold x gradient  
+thresh_min = 20  
+thresh_max = 100  
+sxbinary = np.zeros_like(scaled_sobel)  
+sxbinary[(scaled_sobel &gt;= thresh_min) &amp; (scaled_sobel &lt;= thresh_max)] = 1  
+
+# Threshold color channel  
+s_thresh_min = 170  
+s_thresh_max = 255  
+s_binary = np.zeros_like(s_channel)  
+s_binary[(s_channel &gt;= s_thresh_min) &amp; (s_channel &lt;= s_thresh_max)] = 1  
+
+# Stack each channel to view their individual contributions in green and blue respectively  
+# This returns a stack of the two binary images, whose components you can see as different colors  
+color_binary = np.dstack(( np.zeros_like(sxbinary), sxbinary, s_binary))  
+
+# Combine the two binary thresholds  
+combined_binary = np.zeros_like(sxbinary)  
+combined_binary[(s_binary == 1) | (sxbinary == 1)] = 1  
+
+# Plotting thresholded images  
+f, (ax1, ax2) = plt.subplots(1, 2, figsize=(20,10))  
+ax1.set_title('Stacked thresholds')  
+ax1.imshow(color_binary)  
+
+ax2.set_title('Combined S channel and gradient thresholds')  
+ax2.imshow(combined_binary, cmap='gray')</code></pre>
+<p>The output is shown below. The final image color_binary is a combination of binary thresholding the S channel (HLS) and binary thresholding the result of applying the Sobel operator in the x direction on the original image.<br>
+(Left) Stacked image; the green is the gradient threshold component and the blue is the color channel threshold component.</p>
+<p><img src='l30-channel-plus-gradient-thresholds-stacked-and-combined.png' /></p>
+<p>(Right) black and white combined thresholded image - this one has combined both gradient and color thresholds into one image.<br>
 (Left) Stacked image; the green is the gradient threshold component and the blue is the color channel threshold component. (Right) black and white combined thresholded image - this one has combined both gradient and color thresholds into one image.<br>
 In this next exercise, you'll get the chance to play around with different combinations of color and gradient with the goal using the pipeline you come up with for your upcoming project. There's no correct submission, just explore!</p>
 <p>Some interesting things to explore might include: the H channel, different threshold values for color and gradient binary images, and even a different color space, like HSV!</p>
