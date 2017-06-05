@@ -119,3 +119,280 @@
 
 
 
+
+# ### HLS and Color Thresholds
+# #### L_28_hls_and_color_thresholds Notes
+# 
+
+# In[1]:
+
+get_ipython().magic('matplotlib inline')
+
+
+# In[2]:
+
+import numpy as np
+import cv2
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+
+# read in example images
+image_uniform_lighting = mpimg.imread('l28-test6.jpg')
+image_shadow_and_color = mpimg.imread('l28-test4.jpg')
+
+
+# In[3]:
+
+# Not dry, but quick nad easy
+
+def plot_2_gray_images(im1, im2, title1='', title2=''):
+    # Plot the result
+    f, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 9), frameon=False)
+    f.tight_layout()
+
+    ax1.imshow(im1, cmap='gray')
+    ax1.set_title(title1, fontsize=15)
+    ax1.axis('off')
+
+    # ax2.imshow(gradx, cmap='gray')
+    ax2.imshow(im2, cmap='gray')
+    ax2.set_title(title2, fontsize=15)
+    ax2.axis('off')
+    
+    plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.0)
+    
+    
+def plot_3_gray_images(im1, im2, img3, title1='', title2='', title3=''):
+    # Plot the result
+    f, (ax1, ax2, ax3) = plt.subplots(1, 3, figsize=(12, 9), frameon=False)
+    f.tight_layout()
+
+    ax1.imshow(im1, cmap='gray')
+    ax1.set_title(title1, fontsize=15)
+    ax1.axis('off')
+
+
+    ax2.imshow(im2, cmap='gray')
+    ax2.set_title(title2, fontsize=15)
+    ax2.axis('off')
+
+    ax3.imshow(im2, cmap='gray')
+    ax3.set_title(title3, fontsize=15)
+    ax3.axis('off')
+
+    plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
+
+def plot_1_gray_images(im1, title1=''):
+    # Plot the result
+    f, (ax1) = plt.subplots(1, 2, 1, figsize=(24, 9))
+    f.tight_layout()
+
+    ax1.imshow(im1, cmap='gray')
+    ax1.set_title(title1, fontsize=50)
+    ax1.axis('off')
+
+    plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
+
+
+# <img src='l28-test6.jpg' />
+# You've now seen that various color thresholds can be applied to find the lane lines in images. Here we'll explore this a bit further and look at a couple examples to see why a color space like HLS can be more robust. Let's first take another look at some of the images you saw in the last video.  
+# 
+#  Here I'll read in the same original image (the image above), convert to grayscale, and apply a threshold that identifies the lines:  
+# 
+
+# In[4]:
+
+# use this image in the following examples
+image = image_uniform_lighting
+
+
+# In[5]:
+
+
+thresh = (180, 255)
+gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+binary = np.zeros_like(gray)
+binary[(gray > thresh[0]) & (gray <= thresh[1])] = 1
+
+print()
+print('threshold values: ', thresh)
+plot_2_gray_images(gray, binary, 'Gray', 'Gray Binary')
+
+
+# 
+# You might have also explored thresholding individual RGB color channels. You can take a look at them side by side to see which ones do a better job of picking up the lane lines:  
+# 
+
+# In[6]:
+
+
+R = image[:,:,0]
+G = image[:,:,1]
+B = image[:,:,2]
+
+print()
+plot_3_gray_images(R, G, B, "R", "G", "B")
+
+
+# 
+# The R channel does a reasonable job of highlighting the lines, and you can apply a similar threshold to find lane-line pixels:  
+# 
+
+# In[7]:
+
+thresh = (200, 255)
+binary = np.zeros_like(R)
+binary[(R > thresh[0]) & (R <= thresh[1])] = 1
+
+print()
+print()
+print('Threshold Values: ', thresh)
+plot_2_gray_images(R, binary, "R", "R Binary with Threshold")
+
+
+# In this lesson, we're looking at different color spaces.  
+# While there are several that are worth exploring, here we'll look specifically at **HLS**.  
+# When we separate the H, L, and S channels we get the following result:
+# 
+
+# In[8]:
+
+hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
+H = hls[:,:,0]
+L = hls[:,:,1]
+S = hls[:,:,2]
+
+print()
+plot_3_gray_images(H, L, S, "H", "L", "S")
+
+
+# 
+# The S channel picks up the lines well, so let's try applying a threshold there:
+# 
+
+# In[9]:
+
+
+thresh = (90, 255)
+binary = np.zeros_like(S)
+binary[(S > thresh[0]) & (S <= thresh[1])] = 1
+
+print()
+print('Threshold values: ', thresh)
+plot_2_gray_images(R, binary, "S Channel", "S Binary with Threshold")
+
+
+# 
+# You can also see that in the H channel, the lane lines appear dark, so we could try a low threshold there and obtain the following result:
+# 
+
+# In[10]:
+
+
+thresh = (15, 100)
+binary = np.zeros_like(H)
+binary[(H > thresh[0]) & (H <= thresh[1])] = 1
+
+print()
+print('Threshold Values: ', thresh)
+plot_2_gray_images(H, binary, 'H channel', 'H Binary with Threshold')
+
+
+# 
+# From these examples, you can see that the **S channel is probably your best bet**.  
+# It's cleaner than the H channel result and a bit better than the R channel or simple grayscaling.  
+# But it's not clear that one method is far superior to the others.  
+# 
+# In each case, I've tweaked the threshold parameters to do as good a job as possible of picking out the lines.  
+# Where we can really see a difference in results, however, is when we step to a new frame, where there are **shadows and different colors in the pavement**.  
+# 
+# Look at the same thresholds applied to these same four channels for this image:  
+# 
+# <img src='l28-test4.jpg' />  
+# 
+# Here's how the various channels and binaries (with the same threshold values as above) look:  
+# 
+# 
+
+# In[11]:
+
+# use this image in the next examples
+image = image_shadow_and_color
+
+
+# In[12]:
+
+
+thresh = (180, 255)
+gray = cv2.cvtColor(image, cv2.COLOR_RGB2GRAY)
+binary = np.zeros_like(gray)
+binary[(gray > thresh[0]) & (gray <= thresh[1])] = 1
+
+print()
+print('threshold values: ', thresh)
+plot_2_gray_images(gray, binary, 'Gray', 'Gray Binary')
+
+
+# In[13]:
+
+
+R = image[:,:,0]
+G = image[:,:,1]
+B = image[:,:,2]
+
+# plot_3_gray_images(R, G, B, "R", "G", "B")
+
+
+# In[14]:
+
+thresh = (200, 255)
+binary = np.zeros_like(R)
+binary[(R > thresh[0]) & (R <= thresh[1])] = 1
+
+print()
+print('Threshold Values: ', thresh)
+plot_2_gray_images(R, binary, "R", "R Binary with Threshold")
+
+
+# In[15]:
+
+hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
+H = hls[:,:,0]
+L = hls[:,:,1]
+S = hls[:,:,2]
+
+#plot_3_gray_images(H, L, S, "H", "L", "S")
+
+
+# In[16]:
+
+thresh = (90, 255)
+binary = np.zeros_like(S)
+binary[(S > thresh[0]) & (S <= thresh[1])] = 1
+
+print()
+print('Threshold values: ', thresh)
+plot_2_gray_images(R, binary, "S Channel", "S Binary with Threshold")
+
+
+# In[17]:
+
+
+thresh = (15, 100)
+binary = np.zeros_like(H)
+binary[(H > thresh[0]) & (H <= thresh[1])] = 1
+
+print()
+print('Threshold Values: ', thresh)
+plot_2_gray_images(H, binary, 'H channel', 'H Binary with Threshold')
+
+
+# 
+# Now you can see that, the S channel is still doing a fairly robust job of picking up the lines under very different color and contrast conditions, while the other selections look messy. You could tweak the thresholds and get closer in the other channels, but the S channel is preferable because it is more robust to changing conditions.  
+# 
+# It's worth noting, however, that the R channel still does rather well on the white lines, perhaps even better than the S channel. As with gradients, it's worth considering how you might combine various color thresholds to make the most robust identification of the lines.  
+
+# In[ ]:
+
+
+
