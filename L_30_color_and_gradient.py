@@ -10,7 +10,7 @@
 get_ipython().magic('matplotlib inline')
 
 
-# In[2]:
+# In[7]:
 
 import numpy as np
 import cv2
@@ -79,9 +79,22 @@ def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
     # Stack each channel
     # Note color_binary[:, :, 0] is all 0s, effectively an all black image. 
     # It might be beneficial to replace this channel with something else.
-    color_binary = np.dstack(( np.zeros_like(sxbinary), sxbinary, s_binary))
     
-    return color_binary
+    #color_binary = np.dstack(( np.zeros_like(sxbinary), sxbinary, s_binary))
+    empty_channel = np.zeros_like(s_binary)
+    
+    # colorful green and blue stacked image (red channel is black or all zeros)
+    color_binary = np.dstack(( empty_channel, sxbinary, s_binary))
+    
+    # temp: just to see what it looks like
+    # BW binary combination of sxbinary and s_binary (not using)
+    combined_binary = np.zeros_like(s_binary)
+    combined_binary[ (sxbinary == 1) | (s_binary == 1)] = 1
+    return combined_binary 
+    
+#     return color_binary 
+    
+
     
 result = pipeline(image)
 
