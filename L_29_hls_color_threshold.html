@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head><meta charset="utf-8" />
-<title>L_26_color_thresholding</title>
+<title>L_29_hls_color_threshold</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.10/require.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
@@ -11803,81 +11803,6 @@ div#notebook {
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="Color-Space-Notes">Color Space Notes<a class="anchor-link" href="#Color-Space-Notes">&#182;</a></h3>
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="HLS-Color-Space:"><strong>HLS</strong> Color Space:<a class="anchor-link" href="#HLS-Color-Space:">&#182;</a></h4><p><strong>H</strong> and <strong>S</strong> Channels Stay Fairly <strong>Consistent</strong><br>
-in <strong>Shadow</strong> or Excessive <strong>Brightness</strong>.</p>
-<p>Isolates the <strong>Lightness (L)</strong> Component, which<br>
-<strong>Varies the Most Under Different Lighting Condid\tions</strong></p>
-
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
-<h4 id="A-color-space-is-a-specific-organization-of-colors;-color-spaces-provide-a-way-to-categorize-colors-and-represent-them-in-digital-images.">A <strong>color space</strong> is a specific organization of colors; color spaces provide a way to categorize colors and represent them in digital images.<a class="anchor-link" href="#A-color-space-is-a-specific-organization-of-colors;-color-spaces-provide-a-way-to-categorize-colors-and-represent-them-in-digital-images.">&#182;</a></h4><p><strong>RGB</strong> is red-green-blue color space. You can think of this as a 3D space, in this case a cube, where any color can be represented by a 3D coordinate of R, G, and B values. For example, white has the coordinate <strong>(255, 255, 255)</strong>, which has the maximum value for red, green, and blue.</p>
-<p><strong><em>Note</em></strong>: If you read in an image using <code>matplotlib.image.imread()</code> you will get an <strong>RGB</strong> image, but if you read it in using OpenCV <code>cv2.imread()</code> this will give you a <strong>BGR</strong> image.<br>
-RGB color space<br>
-<img src='l26-rgb-color-cube.png' /><br>
-RGB color space<br>
-There are many other ways to represent the colors in an image besides just composed of red, green, and blue values.</p>
-<p>There is also <strong>HSV</strong> color space (hue, saturation, and value), and <strong>HLS</strong> space (hue, lightness, and saturation). These are some of the <strong>most common</strong>ly used color spaces <strong>in image analysis</strong>.</p>
-<p>To get some intuition about these color spaces, you can generally think of <strong>Hue</strong> as the value that represents color independent of any change in brightness. So if you imagine a basic red paint color, then add some white to it or some black to make that color lighter or darker -- the underlying color remains the same and the hue for all of these colors will be the same.</p>
-<p>On the other hand, <strong>Lightness</strong> and <strong>Value</strong> represent different ways to measure the relative lightness or darkness of a color. For example, a dark red will have a similar hue but much lower value for lightness than a light red.<br>
-<strong>Saturation</strong> also plays a part in this; saturation is a measurement of colorfulness. So, <em>as colors get lighter and closer to white, they have a lower saturation value</em>, whereas colors that are the most intense, like a bright primary color (imagine a bright red, blue, or yellow), have a high saturation value. You can get a better idea of these values by looking at the 3D color spaces pictured below.</p>
-<p>(Left) HSV color space, (Right) HLS color space<br>
-<img src='l26-hsv-hls-color-cylinders.png' />
-(Left) HSV color space, (Right) HLS color space</p>
-<p>Most of these different color spaces were either inspired by the human vision system, and/or developed for efficient use in television screen displays and computer graphics. You can read more about the <a href="https://en.wikipedia.org/wiki/HSL_and_HSV"> history </a> and the derivation of HLS and HSV color spaces here.</p>
-<p>In the code example, I used HLS space to help detect lane lines of different colors and under different lighting conditions.</p>
-<p>OpenCV provides a function <strong><a href="http://docs.opencv.org/2.4/modules/imgproc/doc/miscellaneous_transformations.html#cvtcolor"><code>hls = cv2.cvtColor(im, cv2.COLOR_RGB2HLS)</code>&lt;/a &gt; </strong> that converts images from one color space to another. If you’re interested in the math behind this conversion, take a look at the equations below; note that all this math is for converting 8-bit images, which is the format for most road images in this course. These equations convert one color at a time from RGB to HLS.</p>
-<h4 id="Constants-"><strong>Constants </strong><a class="anchor-link" href="#Constants-">&#182;</a></h4>\begin{equation*}
-V​max​​ ←max(R,G,B)
-\end{equation*}<p><br>
-\begin{equation<em>}
-V​min​​ ←min(R,G,B)
-\end{equation</em>}<br>
-These are the maximum and minimum values across all three RGB values for a given color.</p>
-<h4 id="H-channel-conversion-equations"><strong>H channel conversion equations</strong><a class="anchor-link" href="#H-channel-conversion-equations">&#182;</a></h4><p>There are three different equations.<br>
-Which one is used depends on whether the the value of<br>
-<strong>$V​max​​  $</strong>  is R, G, or B.</p>
-\begin{equation*}
-H←  ​​​​​0 ​+​ \frac{​​30(G−B)​​}{Vmax−Vmin}  ​​, if V​max​​ = R
-\end{equation*}\begin{equation*}
-H← ​​​60 ​+​ \frac{​​30(B−R)​​}{Vmax−Vmin}  ​​, if V​max​​ = G
-\end{equation*}\begin{equation*}
-H←120 ​+​ \frac{​​30(R−G)​​}{Vmax−Vmin}  ​​, if V​max​​ = B
-\end{equation*}<p><strong><em>Note</em></strong>: In <strong>OpenCV</strong>, for <strong>8-bit images</strong>, the range of <strong>H</strong> is from <strong>0-179</strong>.<br>
-It's typically from 0-359 for degrees around the cylindrical colorspace,<br>
-but this number is divided in half so that the range can be represented in an 8-bit image,<br>
-whose color values range from 0-255.</p>
-<h4 id="L-channel-conversion-equation"><strong>L channel conversion equation</strong><a class="anchor-link" href="#L-channel-conversion-equation">&#182;</a></h4>\begin{equation*}
-L←​​\frac{Vmax+Vmin}{2}​​ 
-\end{equation*}<h4 id="S-channel-conversion-equations-"><strong>S channel conversion equations </strong><a class="anchor-link" href="#S-channel-conversion-equations-">&#182;</a></h4><p>There are two possible equations; one is used depending on the value of $L$.</p>
-\begin{equation*}  
-S←​​​\frac{​​​​​​Vmax−Vmin}{​​​​​​​​Vmax+Vmin} ​​​​​​​​​,​​ if L < 0.5
-\end{equation*}<p></p>
-\begin{equation*}  
-S←​​\frac{Vmax−Vmin}{​2−(Vmax+Vmin)} ​​,​​ if L ≥ 0.5 
-\end{equation*}
-</div>
-</div>
-</div>
-<div class="cell border-box-sizing text_cell rendered">
-<div class="prompt input_prompt">
-</div>
-<div class="inner_cell">
-<div class="text_cell_render border-box-sizing rendered_html">
 
 </div>
 </div>
@@ -11900,7 +11825,7 @@ S←​​\frac{Vmax−Vmin}{​2−(Vmax+Vmin)} ​​,​​ if L ≥ 0.5
 </div>
 <div class="inner_cell">
 <div class="text_cell_render border-box-sizing rendered_html">
-<h3 id="HLS-and-Color-Thresholds">HLS and Color Thresholds<a class="anchor-link" href="#HLS-and-Color-Thresholds">&#182;</a></h3><h4 id="L_28_hls_and_color_thresholds-Notes">L_28_hls_and_color_thresholds Notes<a class="anchor-link" href="#L_28_hls_and_color_thresholds-Notes">&#182;</a></h4>
+<h3 id="L_28-HLS-and-Color-Thresholds">L_28 HLS and Color Thresholds<a class="anchor-link" href="#L_28-HLS-and-Color-Thresholds">&#182;</a></h3><h4 id="Code-and-Notes">Code and Notes<a class="anchor-link" href="#Code-and-Notes">&#182;</a></h4>
 </div>
 </div>
 </div>
@@ -33124,6 +33049,94 @@ AEEsAgAAEMQiAAAAQSwCAAAQxCIAAADhD2hPikqoxI2gAAAAAElFTkSuQmCC
 <p>Now you can see that, the S channel is still doing a fairly robust job of picking up the lines under very different color and contrast conditions, while the other selections look messy. You could tweak the thresholds and get closer in the other channels, but the S channel is preferable because it is more robust to changing conditions.</p>
 <p>It's worth noting, however, that the R channel still does rather well on the white lines, perhaps even better than the S channel. As with gradients, it's worth considering how you might combine various color thresholds to make the most robust identification of the lines.</p>
 
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing code_cell rendered">
+<div class="input">
+<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
+<div class="inner_cell">
+    <div class="input_area">
+<div class=" highlight hl-ipython3"><pre><span></span> 
+</pre></div>
+
+</div>
+</div>
+</div>
+
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="L_26-Color-Thresholding">L_26 Color Thresholding<a class="anchor-link" href="#L_26-Color-Thresholding">&#182;</a></h3><h4 id="Color-Space-Notes">Color Space Notes<a class="anchor-link" href="#Color-Space-Notes">&#182;</a></h4>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="HLS-Color-Space:"><strong>HLS</strong> Color Space:<a class="anchor-link" href="#HLS-Color-Space:">&#182;</a></h4><p><strong>H</strong> and <strong>S</strong> Channels Stay Fairly <strong>Consistent</strong><br>
+in <strong>Shadow</strong> or Excessive <strong>Brightness</strong>.</p>
+<p>Isolates the <strong>Lightness (L)</strong> Component, which<br>
+<strong>Varies the Most Under Different Lighting Condid\tions</strong></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="A-color-space-is-a-specific-organization-of-colors;-color-spaces-provide-a-way-to-categorize-colors-and-represent-them-in-digital-images.">A <strong>color space</strong> is a specific organization of colors; color spaces provide a way to categorize colors and represent them in digital images.<a class="anchor-link" href="#A-color-space-is-a-specific-organization-of-colors;-color-spaces-provide-a-way-to-categorize-colors-and-represent-them-in-digital-images.">&#182;</a></h4><p><strong>RGB</strong> is red-green-blue color space. You can think of this as a 3D space, in this case a cube, where any color can be represented by a 3D coordinate of R, G, and B values. For example, white has the coordinate <strong>(255, 255, 255)</strong>, which has the maximum value for red, green, and blue.</p>
+<p><strong><em>Note</em></strong>: If you read in an image using <code>matplotlib.image.imread()</code> you will get an <strong>RGB</strong> image, but if you read it in using OpenCV <code>cv2.imread()</code> this will give you a <strong>BGR</strong> image.<br>
+RGB color space<br>
+<img src='l26-rgb-color-cube.png' /><br>
+RGB color space</p>
+<p>There are many other ways to represent the colors in an image besides just composed of red, green, and blue values.</p>
+<p>There is also <strong>HSV</strong> color space (hue, saturation, and value), and <strong>HLS</strong> space (hue, lightness, and saturation). These are some of the <strong>most common</strong>ly used color spaces <strong>in image analysis</strong>.</p>
+<p>To get some intuition about these color spaces, you can generally think of <strong>Hue</strong> as the value that represents color independent of any change in brightness. So if you imagine a basic red paint color, then add some white to it or some black to make that color lighter or darker -- the underlying color remains the same and the hue for all of these colors will be the same.</p>
+<p>On the other hand, <strong>Lightness</strong> and <strong>Value</strong> represent different ways to measure the relative lightness or darkness of a color. For example, a dark red will have a similar hue but much lower value for lightness than a light red.<br>
+<strong>Saturation</strong> also plays a part in this; saturation is a measurement of colorfulness. So, <em>as colors get lighter and closer to white, they have a lower saturation value</em>, whereas colors that are the most intense, like a bright primary color (imagine a bright red, blue, or yellow), have a high saturation value. You can get a better idea of these values by looking at the 3D color spaces pictured below.</p>
+<p>(Left) HSV color space, (Right) HLS color space<br>
+<img src='l26-hsv-hls-color-cylinders.png' />
+(Left) HSV color space, (Right) HLS color space</p>
+<p>Most of these different color spaces were either inspired by the human vision system, and/or developed for efficient use in television screen displays and computer graphics. You can read more about the <a href="https://en.wikipedia.org/wiki/HSL_and_HSV"> history </a> and the derivation of HLS and HSV color spaces here.</p>
+<p>In the code example, I used HLS space to help detect lane lines of different colors and under different lighting conditions.</p>
+<p>OpenCV provides a function <strong><a href="http://docs.opencv.org/2.4/modules/imgproc/doc/miscellaneous_transformations.html#cvtcolor"><code>hls = cv2.cvtColor(im, cv2.COLOR_RGB2HLS)</code>&lt;/a &gt; </strong> that converts images from one color space to another. If you’re interested in the math behind this conversion, take a look at the equations below; note that all this math is for converting 8-bit images, which is the format for most road images in this course. These equations convert one color at a time from RGB to HLS.</p>
+<h4 id="Constants-"><strong>Constants </strong><a class="anchor-link" href="#Constants-">&#182;</a></h4>\begin{equation*}
+V​max​​ ←max(R,G,B)
+\end{equation*}<p><br>
+\begin{equation<em>}
+V​min​​ ←min(R,G,B)
+\end{equation</em>}<br>
+These are the maximum and minimum values across all three RGB values for a given color.</p>
+<h4 id="H-channel-conversion-equations"><strong>H channel conversion equations</strong><a class="anchor-link" href="#H-channel-conversion-equations">&#182;</a></h4><p>There are three different equations.<br>
+Which one is used depends on whether the the value of<br>
+<strong>$V​max​​  $</strong>  is R, G, or B.</p>
+\begin{equation*}
+H←  ​​​​​0 ​+​ \frac{​​30(G−B)​​}{Vmax−Vmin}  ​​, if V​max​​ = R
+\end{equation*}\begin{equation*}
+H← ​​​60 ​+​ \frac{​​30(B−R)​​}{Vmax−Vmin}  ​​, if V​max​​ = G
+\end{equation*}\begin{equation*}
+H←120 ​+​ \frac{​​30(R−G)​​}{Vmax−Vmin}  ​​, if V​max​​ = B
+\end{equation*}<p><strong><em>Note</em></strong>: In <strong>OpenCV</strong>, for <strong>8-bit images</strong>, the range of <strong>H</strong> is from <strong>0-179</strong>.<br>
+It's typically from 0-359 for degrees around the cylindrical colorspace,<br>
+but this number is divided in half so that the range can be represented in an 8-bit image,<br>
+whose color values range from 0-255.</p>
+<h4 id="L-channel-conversion-equation"><strong>L channel conversion equation</strong><a class="anchor-link" href="#L-channel-conversion-equation">&#182;</a></h4>\begin{equation*}
+L←​​\frac{Vmax+Vmin}{2}​​ 
+\end{equation*}<h4 id="S-channel-conversion-equations-"><strong>S channel conversion equations </strong><a class="anchor-link" href="#S-channel-conversion-equations-">&#182;</a></h4><p>There are two possible equations; one is used depending on the value of $L$.</p>
+\begin{equation*}  
+S←​​​\frac{​​​​​​Vmax−Vmin}{​​​​​​​​Vmax+Vmin} ​​​​​​​​​,​​ if L < 0.5
+\end{equation*}<p></p>
+\begin{equation*}  
+S←​​\frac{Vmax−Vmin}{​2−(Vmax+Vmin)} ​​,​​ if L ≥ 0.5 
+\end{equation*}
 </div>
 </div>
 </div>
