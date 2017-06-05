@@ -5,12 +5,12 @@
 # 
 # #### My Solution
 
-# In[6]:
+# In[1]:
 
 get_ipython().magic('matplotlib inline')
 
 
-# In[7]:
+# In[2]:
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -29,13 +29,13 @@ def hls_select(img, thresh=(0, 255)):
     S = hls[:,:,2]
     
     # 2) Apply a threshold to the S channel
-    binary_output = np.zeros_like(img)
+    binary_output = np.zeros_like(S)
     binary_output[ (S > thresh[0]) & (S <= thresh[1]) ] = 1
     
     # 3) Return a binary image of threshold result
     return binary_output
     
-hls_binary = hls_select(image, thresh=(0, 255))
+hls_binary = hls_select(image, thresh=(90, 255))
 
 # Plot the result
 f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
@@ -66,7 +66,7 @@ plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 
 # ### L_29 start file
 
-# In[ ]:
+# In[3]:
 
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
@@ -110,12 +110,12 @@ plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 # #### Code and Notes
 # 
 
-# In[1]:
+# In[4]:
 
 get_ipython().magic('matplotlib inline')
 
 
-# In[2]:
+# In[5]:
 
 import numpy as np
 import cv2
@@ -127,7 +127,7 @@ image_uniform_lighting = mpimg.imread('l28-test6.jpg')
 image_shadow_and_color = mpimg.imread('l28-test4.jpg')
 
 
-# In[3]:
+# In[6]:
 
 # Not dry, but quick nad easy
 
@@ -186,13 +186,13 @@ def plot_1_gray_images(im1, title1=''):
 #  Here I'll read in the same original image (the image above), convert to grayscale, and apply a threshold that identifies the lines:  
 # 
 
-# In[4]:
+# In[7]:
 
 # use this image in the following examples
 image = image_uniform_lighting
 
 
-# In[5]:
+# In[8]:
 
 
 thresh = (180, 255)
@@ -209,7 +209,7 @@ plot_2_gray_images(gray, binary, 'Gray', 'Gray Binary')
 # You might have also explored thresholding individual RGB color channels. You can take a look at them side by side to see which ones do a better job of picking up the lane lines:  
 # 
 
-# In[6]:
+# In[9]:
 
 
 R = image[:,:,0]
@@ -224,7 +224,7 @@ plot_3_gray_images(R, G, B, "R", "G", "B")
 # The R channel does a reasonable job of highlighting the lines, and you can apply a similar threshold to find lane-line pixels:  
 # 
 
-# In[7]:
+# In[10]:
 
 thresh = (200, 255)
 binary = np.zeros_like(R)
@@ -241,7 +241,7 @@ plot_2_gray_images(R, binary, "R", "R Binary with Threshold")
 # When we separate the H, L, and S channels we get the following result:
 # 
 
-# In[8]:
+# In[11]:
 
 hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
 H = hls[:,:,0]
@@ -256,7 +256,7 @@ plot_3_gray_images(H, L, S, "H", "L", "S")
 # The S channel picks up the lines well, so let's try applying a threshold there:
 # 
 
-# In[9]:
+# In[12]:
 
 
 thresh = (90, 255)
@@ -272,7 +272,7 @@ plot_2_gray_images(R, binary, "S Channel", "S Binary with Threshold")
 # You can also see that in the H channel, the lane lines appear dark, so we could try a low threshold there and obtain the following result:
 # 
 
-# In[10]:
+# In[13]:
 
 
 thresh = (15, 100)
@@ -300,13 +300,13 @@ plot_2_gray_images(H, binary, 'H channel', 'H Binary with Threshold')
 # 
 # 
 
-# In[11]:
+# In[14]:
 
 # use this image in the next examples
 image = image_shadow_and_color
 
 
-# In[12]:
+# In[15]:
 
 
 thresh = (180, 255)
@@ -319,7 +319,7 @@ print('threshold values: ', thresh)
 plot_2_gray_images(gray, binary, 'Gray', 'Gray Binary')
 
 
-# In[13]:
+# In[16]:
 
 
 R = image[:,:,0]
@@ -329,7 +329,7 @@ B = image[:,:,2]
 # plot_3_gray_images(R, G, B, "R", "G", "B")
 
 
-# In[14]:
+# In[17]:
 
 thresh = (200, 255)
 binary = np.zeros_like(R)
@@ -340,7 +340,7 @@ print('Threshold Values: ', thresh)
 plot_2_gray_images(R, binary, "R", "R Binary with Threshold")
 
 
-# In[15]:
+# In[18]:
 
 hls = cv2.cvtColor(image, cv2.COLOR_RGB2HLS)
 H = hls[:,:,0]
@@ -350,7 +350,7 @@ S = hls[:,:,2]
 #plot_3_gray_images(H, L, S, "H", "L", "S")
 
 
-# In[16]:
+# In[19]:
 
 thresh = (90, 255)
 binary = np.zeros_like(S)
@@ -361,7 +361,7 @@ print('Threshold values: ', thresh)
 plot_2_gray_images(R, binary, "S Channel", "S Binary with Threshold")
 
 
-# In[17]:
+# In[20]:
 
 
 thresh = (15, 100)
