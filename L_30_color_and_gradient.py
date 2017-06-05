@@ -5,12 +5,12 @@
 # 
 # #### My Solution:
 
-# In[ ]:
+# In[1]:
 
 get_ipython().magic('matplotlib inline')
 
 
-# In[ ]:
+# In[2]:
 
 import numpy as np
 import cv2
@@ -40,9 +40,16 @@ def pipeline(orig_image, s_thresh=(170, 255), sx_thresh=(20, 100)):
     
     
     # Convert to HSV color space and separate the V channel
-    hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
-    l_channel = hsv[:,:,1]
-    s_channel = hsv[:,:,2]
+    ##
+    ## HUH? why is HLS conversion being labeled as an HSV conversion ??
+    #
+    # hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
+    # 
+    ## -SH
+    
+    hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)    
+    l_channel = hls[:,:,1]
+    s_channel = hls[:,:,2]
     
     # Sobel x
     sobelx = cv2.Sobel(l_channel, cv2.CV_64F, 1, 0) # Take the derivative in x
@@ -84,9 +91,7 @@ plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 
 
 # #### Code from Instructions' cell:  
-
-# In[ ]:
-
+""" 
 # Convert to HLS color space and separate the S channel
 # Note: img is the undistorted image
 hls = cv2.cvtColor(img, cv2.COLOR_RGB2HLS)
@@ -129,8 +134,8 @@ ax1.imshow(color_binary)
 
 ax2.set_title('Combined S channel and gradient thresholds')
 ax2.imshow(combined_binary, cmap='gray')
-
-
+"""  
+''
 # ### L_30 Notes and Instructions
 
 # # Color and Gradient  
@@ -246,7 +251,7 @@ ax2.imshow(combined_binary, cmap='gray')
 
 # #### L_30 Start File:  
 
-# In[ ]:
+# In[3]:
 
 import numpy as np
 import cv2
@@ -270,6 +275,15 @@ def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
     # -SH
 
     img = np.copy(img)
+    
+    ## HUH? BELOW: 
+    ##
+    ## Why is HLS conversion being labeled as an HSV conversion ??
+    #
+    # hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
+    # 
+    ## -SH
+     
     
     # Convert to HSV color space and separate the V channel
     hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
