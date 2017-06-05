@@ -11746,12 +11746,47 @@ div#notebook {
   <div tabindex="-1" id="notebook" class="border-box-sizing">
     <div class="container" id="notebook-container">
 
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="L_29-HLS-Color-Threshold">L_29 HLS Color Threshold<a class="anchor-link" href="#L_29-HLS-Color-Threshold">&#182;</a></h3><h4 id="My-Solution">My Solution<a class="anchor-link" href="#My-Solution">&#182;</a></h4>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.image</span> <span class="k">as</span> <span class="nn">mpimg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
+
+<span class="c1"># Read in an image, you can also try test1.jpg or test4.jpg</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;test6.jpg&#39;</span><span class="p">)</span> 
+
+<span class="c1"># Define a function that thresholds the S-channel of HLS</span>
+<span class="c1"># Use exclusive lower bound (&gt;) and inclusive upper (&lt;=)</span>
+<span class="k">def</span> <span class="nf">hls_select</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)):</span>
+    <span class="c1"># 1) Convert to HLS color space</span>
+    <span class="c1"># 2) Apply a threshold to the S channel</span>
+    <span class="c1"># 3) Return a binary image of threshold result</span>
+    <span class="n">binary_output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="c1"># placeholder line</span>
+    <span class="k">return</span> <span class="n">binary_output</span>
+    
+<span class="n">hls_binary</span> <span class="o">=</span> <span class="n">hls_select</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
+
+<span class="c1"># Plot the result</span>
+<span class="n">f</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="n">f</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Original Image&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">hls_binary</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Thresholded S&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11759,38 +11794,71 @@ div#notebook {
 </div>
 
 </div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="L_29-Quiz-Instructions">L_29 Quiz Instructions<a class="anchor-link" href="#L_29-Quiz-Instructions">&#182;</a></h3>
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h4 id="HLS-Color-Threshold">HLS Color Threshold<a class="anchor-link" href="#HLS-Color-Threshold">&#182;</a></h4><p>In this exercise, you can try applying a color threshold in the HLS color space.<br>
+If you have any problems with the implementation, please refer to the previous video and instructor notes.</p>
+<p>Your task here is to write a function that takes in an image and threshold values and returns a binary output from applying the threshold to the <strong>S-channel</strong>.<br>
+Apply your thresholds as you did for gradients, but this time<br>
+use an <strong>exclusive (<code>&gt;</code>) lower bound</strong> and an <strong>inclusive upper bound</strong> (<code>&lt;=</code>).</p>
+<p><img src="l29-hls-binary.jpg" /></p>
+
+</div>
+</div>
+</div>
+<div class="cell border-box-sizing text_cell rendered">
+<div class="prompt input_prompt">
+</div>
+<div class="inner_cell">
+<div class="text_cell_render border-box-sizing rendered_html">
+<h3 id="L_29-start-file">L_29 start file<a class="anchor-link" href="#L_29-start-file">&#182;</a></h3>
+</div>
+</div>
+</div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
 <div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
 <div class="inner_cell">
     <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
+<div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">import</span> <span class="nn">matplotlib.image</span> <span class="k">as</span> <span class="nn">mpimg</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">cv2</span>
 
-</div>
-</div>
-</div>
+<span class="c1"># Read in an image, you can also try test1.jpg or test4.jpg</span>
+<span class="n">image</span> <span class="o">=</span> <span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;test6.jpg&#39;</span><span class="p">)</span> 
 
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
-</pre></div>
+<span class="c1"># Define a function that thresholds the S-channel of HLS</span>
+<span class="c1"># Use exclusive lower bound (&gt;) and inclusive upper (&lt;=)</span>
+<span class="k">def</span> <span class="nf">hls_select</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">)):</span>
+    <span class="c1"># 1) Convert to HLS color space</span>
+    <span class="c1"># 2) Apply a threshold to the S channel</span>
+    <span class="c1"># 3) Return a binary image of threshold result</span>
+    <span class="n">binary_output</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">img</span><span class="p">)</span> <span class="c1"># placeholder line</span>
+    <span class="k">return</span> <span class="n">binary_output</span>
+    
+<span class="n">hls_binary</span> <span class="o">=</span> <span class="n">hls_select</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">))</span>
 
-</div>
-</div>
-</div>
-
-</div>
-<div class="cell border-box-sizing code_cell rendered">
-<div class="input">
-<div class="prompt input_prompt">In&nbsp;[&nbsp;]:</div>
-<div class="inner_cell">
-    <div class="input_area">
-<div class=" highlight hl-ipython3"><pre><span></span> 
+<span class="c1"># Plot the result</span>
+<span class="n">f</span><span class="p">,</span> <span class="p">(</span><span class="n">ax1</span><span class="p">,</span> <span class="n">ax2</span><span class="p">)</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">24</span><span class="p">,</span> <span class="mi">9</span><span class="p">))</span>
+<span class="n">f</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+<span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Original Image&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">hls_binary</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Thresholded S&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
 </pre></div>
 
 </div>

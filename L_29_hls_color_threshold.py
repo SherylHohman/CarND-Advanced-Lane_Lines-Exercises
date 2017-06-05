@@ -1,24 +1,86 @@
 
 # coding: utf-8
 
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
+# ### L_29 HLS Color Threshold
+# 
+# #### My Solution
 
 # In[ ]:
 
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import numpy as np
+import cv2
+
+# Read in an image, you can also try test1.jpg or test4.jpg
+image = mpimg.imread('test6.jpg') 
+
+# Define a function that thresholds the S-channel of HLS
+# Use exclusive lower bound (>) and inclusive upper (<=)
+def hls_select(img, thresh=(0, 255)):
+    # 1) Convert to HLS color space
+    # 2) Apply a threshold to the S channel
+    # 3) Return a binary image of threshold result
+    binary_output = np.copy(img) # placeholder line
+    return binary_output
+    
+hls_binary = hls_select(image, thresh=(0, 255))
+
+# Plot the result
+f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
+f.tight_layout()
+ax1.imshow(image)
+ax1.set_title('Original Image', fontsize=50)
+ax2.imshow(hls_binary, cmap='gray')
+ax2.set_title('Thresholded S', fontsize=50)
+plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 
 
+# ### L_29 Quiz Instructions
+
+# #### HLS Color Threshold
+# 
+# In this exercise, you can try applying a color threshold in the HLS color space.  
+# If you have any problems with the implementation, please refer to the previous video and instructor notes.  
+# 
+# Your task here is to write a function that takes in an image and threshold values and returns a binary output from applying the threshold to the **S-channel**.  
+# Apply your thresholds as you did for gradients, but this time   
+# use an **exclusive (`>`) lower bound** and an **inclusive upper bound** (`<=`).  
+# 
+# <img src="l29-hls-binary.jpg" />
+# 
+
+# ### L_29 start file
 
 # In[ ]:
 
+import matplotlib.pyplot as plt
+import matplotlib.image as mpimg
+import numpy as np
+import cv2
 
+# Read in an image, you can also try test1.jpg or test4.jpg
+image = mpimg.imread('test6.jpg') 
+
+# Define a function that thresholds the S-channel of HLS
+# Use exclusive lower bound (>) and inclusive upper (<=)
+def hls_select(img, thresh=(0, 255)):
+    # 1) Convert to HLS color space
+    # 2) Apply a threshold to the S channel
+    # 3) Return a binary image of threshold result
+    binary_output = np.copy(img) # placeholder line
+    return binary_output
+    
+hls_binary = hls_select(image, thresh=(0, 255))
+
+# Plot the result
+f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
+f.tight_layout()
+ax1.imshow(image)
+ax1.set_title('Original Image', fontsize=50)
+ax2.imshow(hls_binary, cmap='gray')
+ax2.set_title('Thresholded S', fontsize=50)
+plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 
 
 # 
