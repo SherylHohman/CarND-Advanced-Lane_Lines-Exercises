@@ -22,8 +22,8 @@ image = mpimg.imread('bridge_shadow.jpg')
 
 # Edit this function to create your own pipeline.
  
-def pipeline(orig_image, s_thresh=(170, 255), sx_thresh=(20, 100)):
-# def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
+def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
+# def pipeline(orig_image, s_thresh=(170, 255), sx_thresh=(20, 100)):
 
     #     ## !! LINE BELOW :: HOW DOES DEEP COPYING TO ITSELF HELP ??!!
     #     ## WHAT AM I MISSING HERE ?
@@ -31,12 +31,20 @@ def pipeline(orig_image, s_thresh=(170, 255), sx_thresh=(20, 100)):
     #
     #     # SHOULD IT NOT BE: ??
     #     img_copy = np.copy(img) 
+    #
+    #     # IN Fact, does Not Python Pass by COPY Always ??
+    #     # So np.copy() is NOT Needed At All??
+    #
+    #     # Indeed: If I remove that line, 
+    #     # "Original Image" plots the orig image, as Expected !
     #    
-    #  -SH
+    # -SH
     
     # SH:  changed name of passed in image to "orig_image" in function definition.  
     # Now I can make a copy:
-    img = np.copy(orig_image)
+#   # img = np.copy(orig_image)
+    # Why do I even need to make a copy ?? Python always passes by Copy, right??
+    ## - When I comment out that line, and print "Original Image later, It prints Orig image! -
     
     
     # Convert to HSV color space and separate the V channel
@@ -51,9 +59,13 @@ def pipeline(orig_image, s_thresh=(170, 255), sx_thresh=(20, 100)):
     l_channel = hls[:,:,1]
     s_channel = hls[:,:,2]
     
-    # Sobel x
-    sobelx = cv2.Sobel(l_channel, cv2.CV_64F, 1, 0) # Take the derivative in x
-    abs_sobelx = np.absolute(sobelx) # Absolute x derivative to accentuate lines away from horizontal
+    ## Sobel x
+    # Take the derivative in x
+    sobelx = cv2.Sobel(l_channel, cv2.CV_64F, 1, 0) 
+    
+    # Absolute x derivative to accentuate lines away from horizontal
+    abs_sobelx = np.absolute(sobelx) 
+    
     scaled_sobel = np.uint8(255*abs_sobelx/np.max(abs_sobelx))
     
     # Threshold x gradient
@@ -271,6 +283,12 @@ def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
     #
     #     # SHOULD IT NOT BE: ??
     #     img_copy = np.copy(img) 
+    #
+    #     # IN Fact, does Not Python Pass by COPY Always ??
+    #     # So np.copy() is NOT Needed At All??
+    #
+    #     # Indeed: If I remove that line, 
+    #     # "Original Image" plots the orig image, as Expected !
     #    
     # -SH
 
@@ -283,8 +301,7 @@ def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
     # hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
     # 
     ## -SH
-     
-    
+         
     # Convert to HSV color space and separate the V channel
     hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)
     l_channel = hsv[:,:,1]

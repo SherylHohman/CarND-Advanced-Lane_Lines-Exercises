@@ -11783,8 +11783,8 @@ div#notebook {
 
 <span class="c1"># Edit this function to create your own pipeline.</span>
  
-<span class="k">def</span> <span class="nf">pipeline</span><span class="p">(</span><span class="n">orig_image</span><span class="p">,</span> <span class="n">s_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">170</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">sx_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
-<span class="c1"># def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):</span>
+<span class="k">def</span> <span class="nf">pipeline</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">s_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">170</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">sx_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
+<span class="c1"># def pipeline(orig_image, s_thresh=(170, 255), sx_thresh=(20, 100)):</span>
 
     <span class="c1">#     ## !! LINE BELOW :: HOW DOES DEEP COPYING TO ITSELF HELP ??!!</span>
     <span class="c1">#     ## WHAT AM I MISSING HERE ?</span>
@@ -11792,12 +11792,20 @@ div#notebook {
     <span class="c1">#</span>
     <span class="c1">#     # SHOULD IT NOT BE: ??</span>
     <span class="c1">#     img_copy = np.copy(img) </span>
+    <span class="c1">#</span>
+    <span class="c1">#     # IN Fact, does Not Python Pass by COPY Always ??</span>
+    <span class="c1">#     # So np.copy() is NOT Needed At All??</span>
+    <span class="c1">#</span>
+    <span class="c1">#     # Indeed: If I remove that line, </span>
+    <span class="c1">#     # &quot;Original Image&quot; plots the orig image, as Expected !</span>
     <span class="c1">#    </span>
-    <span class="c1">#  -SH</span>
+    <span class="c1"># -SH</span>
     
     <span class="c1"># SH:  changed name of passed in image to &quot;orig_image&quot; in function definition.  </span>
     <span class="c1"># Now I can make a copy:</span>
-    <span class="n">img</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">copy</span><span class="p">(</span><span class="n">orig_image</span><span class="p">)</span>
+<span class="c1">#   # img = np.copy(orig_image)</span>
+    <span class="c1"># Why do I even need to make a copy ?? Python always passes by Copy, right??</span>
+    <span class="c1">## - When I comment out that line, and print &quot;Original Image later, It prints Orig image! -</span>
     
     
     <span class="c1"># Convert to HSV color space and separate the V channel</span>
@@ -11812,9 +11820,13 @@ div#notebook {
     <span class="n">l_channel</span> <span class="o">=</span> <span class="n">hls</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span>
     <span class="n">s_channel</span> <span class="o">=</span> <span class="n">hls</span><span class="p">[:,:,</span><span class="mi">2</span><span class="p">]</span>
     
-    <span class="c1"># Sobel x</span>
-    <span class="n">sobelx</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">Sobel</span><span class="p">(</span><span class="n">l_channel</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_64F</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> <span class="c1"># Take the derivative in x</span>
-    <span class="n">abs_sobelx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">sobelx</span><span class="p">)</span> <span class="c1"># Absolute x derivative to accentuate lines away from horizontal</span>
+    <span class="c1">## Sobel x</span>
+    <span class="c1"># Take the derivative in x</span>
+    <span class="n">sobelx</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">Sobel</span><span class="p">(</span><span class="n">l_channel</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">CV_64F</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span> 
+    
+    <span class="c1"># Absolute x derivative to accentuate lines away from horizontal</span>
+    <span class="n">abs_sobelx</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">absolute</span><span class="p">(</span><span class="n">sobelx</span><span class="p">)</span> 
+    
     <span class="n">scaled_sobel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">(</span><span class="mi">255</span><span class="o">*</span><span class="n">abs_sobelx</span><span class="o">/</span><span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">abs_sobelx</span><span class="p">))</span>
     
     <span class="c1"># Threshold x gradient</span>
@@ -22728,6 +22740,12 @@ with the goal <strong>using the pipeline you come up with for your upcoming proj
     <span class="c1">#</span>
     <span class="c1">#     # SHOULD IT NOT BE: ??</span>
     <span class="c1">#     img_copy = np.copy(img) </span>
+    <span class="c1">#</span>
+    <span class="c1">#     # IN Fact, does Not Python Pass by COPY Always ??</span>
+    <span class="c1">#     # So np.copy() is NOT Needed At All??</span>
+    <span class="c1">#</span>
+    <span class="c1">#     # Indeed: If I remove that line, </span>
+    <span class="c1">#     # &quot;Original Image&quot; plots the orig image, as Expected !</span>
     <span class="c1">#    </span>
     <span class="c1"># -SH</span>
 
@@ -22740,8 +22758,7 @@ with the goal <strong>using the pipeline you come up with for your upcoming proj
     <span class="c1"># hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)</span>
     <span class="c1"># </span>
     <span class="c1">## -SH</span>
-     
-    
+         
     <span class="c1"># Convert to HSV color space and separate the V channel</span>
     <span class="n">hsv</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2HLS</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>
     <span class="n">l_channel</span> <span class="o">=</span> <span class="n">hsv</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span>
