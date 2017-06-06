@@ -10,7 +10,7 @@
 get_ipython().magic('matplotlib inline')
 
 
-# In[7]:
+# In[2]:
 
 import numpy as np
 import cv2
@@ -90,23 +90,43 @@ def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
     # BW binary combination of sxbinary and s_binary (not using)
     combined_binary = np.zeros_like(s_binary)
     combined_binary[ (sxbinary == 1) | (s_binary == 1)] = 1
-    return combined_binary 
+    #return combined_binary 
     
-#     return color_binary 
+    return color_binary, combined_binary 
     
-
+## SET THRESHOLD VALUES HERE
+s_thresh  = (90, 255)  # These were good values from L_29
+sx_thresh = (20, 100)
     
-result = pipeline(image)
+color_result, BW_result = pipeline(image, s_thresh)
 
 # Plot the result
-f, (ax1, ax2) = plt.subplots(1, 2, figsize=(24, 9))
+
+# how many images across and how many image rows
+nrows = 3  #1
+ncols = 1  #2
+# figsize must be recalculated when change nrows and ncols
+figsize = (12, 18) #1x2: (24,9)
+# fonstsize is dependant on size of subplot
+fontsize = 10 #40
+
+# f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(24, 9))
+f, (ax1, ax2, ax3) = plt.subplots(nrows, ncols, figsize=figsize)
 f.tight_layout()
 
-ax1.imshow(image)
-ax1.set_title('Original Image', fontsize=40)
+ax1.imshow(color_result)
+ax1.set_title('BLUE: S-channel  |  GREEN: Sobel x-dir  | CYAN: both', fontsize=fontsize)
+ax1.axis('off')
 
-ax2.imshow(result)
-ax2.set_title('Pipeline Result', fontsize=40)
+ax2.imshow(BW_result, cmap='gray')
+ax2.set_title('S_thresh:'+str(s_thresh)+'  |  sobelx_thresh: '+str(sx_thresh), fontsize=fontsize)
+ax2.axis('off')
+
+ax3.imshow(image)
+ax3.set_title('Original Image', fontsize=fontsize)
+ax3.axis('off')
+
+
 plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 
 
