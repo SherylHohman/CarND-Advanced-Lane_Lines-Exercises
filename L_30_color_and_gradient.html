@@ -11770,7 +11770,7 @@ div#notebook {
 </div>
 <div class="cell border-box-sizing code_cell rendered">
 <div class="input">
-<div class="prompt input_prompt">In&nbsp;[13]:</div>
+<div class="prompt input_prompt">In&nbsp;[2]:</div>
 <div class="inner_cell">
     <div class="input_area">
 <div class=" highlight hl-ipython3"><pre><span></span><span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -11780,41 +11780,8 @@ div#notebook {
 
 <span class="n">image</span> <span class="o">=</span> <span class="n">mpimg</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s1">&#39;bridge_shadow.jpg&#39;</span><span class="p">)</span>
 
-
-<span class="c1"># Edit this function to create your own pipeline.</span>
- 
 <span class="k">def</span> <span class="nf">pipeline</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">s_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">170</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span> <span class="n">sx_thresh</span><span class="o">=</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="mi">100</span><span class="p">)):</span>
 <span class="c1"># def pipeline(orig_image, s_thresh=(170, 255), sx_thresh=(20, 100)):</span>
-
-    <span class="c1">#     ## !! LINE BELOW :: HOW DOES DEEP COPYING TO ITSELF HELP ??!!</span>
-    <span class="c1">#     ## WHAT AM I MISSING HERE ?</span>
-    <span class="c1">#     img = np.copy(img)</span>
-    <span class="c1">#</span>
-    <span class="c1">#     # SHOULD IT NOT BE: ??</span>
-    <span class="c1">#     img_copy = np.copy(img) </span>
-    <span class="c1">#</span>
-    <span class="c1">#     # IN Fact, does Not Python Pass by COPY Always ??</span>
-    <span class="c1">#     # So np.copy() is NOT Needed At All??</span>
-    <span class="c1">#</span>
-    <span class="c1">#     # Indeed: If I remove that line, </span>
-    <span class="c1">#     # &quot;Original Image&quot; plots the orig image, as Expected !</span>
-    <span class="c1">#    </span>
-    <span class="c1"># -SH</span>
-    
-    <span class="c1"># SH:  changed name of passed in image to &quot;orig_image&quot; in function definition.  </span>
-    <span class="c1"># Now I can make a copy:</span>
-<span class="c1">#   # img = np.copy(orig_image)</span>
-    <span class="c1"># Why do I even need to make a copy ?? Python always passes by Copy, right??</span>
-    <span class="c1">## - When I comment out that line, and print &quot;Original Image later, It prints Orig image! -</span>
-    
-    
-    <span class="c1"># Convert to HSV color space and separate the V channel</span>
-    <span class="c1">##</span>
-    <span class="c1">## HUH? why is HLS conversion being labeled as an HSV conversion ??</span>
-    <span class="c1">#</span>
-    <span class="c1"># hsv = cv2.cvtColor(img, cv2.COLOR_RGB2HLS).astype(np.float)</span>
-    <span class="c1"># </span>
-    <span class="c1">## -SH</span>
     
     <span class="n">hls</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_RGB2HLS</span><span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float</span><span class="p">)</span>    
     <span class="n">l_channel</span> <span class="o">=</span> <span class="n">hls</span><span class="p">[:,:,</span><span class="mi">1</span><span class="p">]</span>
@@ -11839,7 +11806,6 @@ div#notebook {
     
     <span class="c1"># Stack each channel</span>
     <span class="c1"># Note color_binary[:, :, 0] is all 0s, effectively an all black image. </span>
-    <span class="c1"># It might be beneficial to replace this channel with something else.</span>
     
     <span class="c1">#color_binary = np.dstack(( np.zeros_like(sxbinary), sxbinary, s_binary))</span>
     <span class="n">empty_channel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">s_binary</span><span class="p">)</span>
@@ -11847,7 +11813,6 @@ div#notebook {
     <span class="c1"># colorful green and blue stacked image (red channel is black or all zeros)</span>
     <span class="n">color_binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span> <span class="n">empty_channel</span><span class="p">,</span> <span class="n">sxbinary</span><span class="p">,</span> <span class="n">s_binary</span><span class="p">))</span>
     
-    <span class="c1"># temp: just to see what it looks like</span>
     <span class="c1"># BW binary combination of sxbinary and s_binary (not using)</span>
     <span class="n">bw_binary</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">s_binary</span><span class="p">)</span>
     <span class="n">bw_binary</span><span class="p">[</span> <span class="p">(</span><span class="n">sxbinary</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="o">|</span> <span class="p">(</span><span class="n">s_binary</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)]</span> <span class="o">=</span> <span class="mi">1</span>
@@ -11861,8 +11826,7 @@ div#notebook {
     
 <span class="n">color_result</span><span class="p">,</span> <span class="n">bw_result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">s_thresh</span><span class="p">)</span>
 
-<span class="c1"># Plot the result</span>
-
+<span class="c1"># Plot the results</span>
 <span class="c1"># how many images across and how many image rows</span>
 <span class="n">nrows</span> <span class="o">=</span> <span class="mi">3</span>  <span class="c1">#1</span>
 <span class="n">ncols</span> <span class="o">=</span> <span class="mi">1</span>  <span class="c1">#2</span>
@@ -11879,7 +11843,7 @@ div#notebook {
 <span class="n">ax1</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;BLUE: S-channel  |  GREEN: Sobel x-dir  | CYAN: both&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
 <span class="n">ax1</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
 
-<span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">BW_result</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
+<span class="n">ax2</span><span class="o">.</span><span class="n">imshow</span><span class="p">(</span><span class="n">bw_result</span><span class="p">,</span> <span class="n">cmap</span><span class="o">=</span><span class="s1">&#39;gray&#39;</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;S_thresh:&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s_thresh</span><span class="p">)</span><span class="o">+</span><span class="s1">&#39;  |  sobelx_thresh: &#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">sx_thresh</span><span class="p">),</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
 <span class="n">ax2</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
 
@@ -11887,51 +11851,34 @@ div#notebook {
 <span class="n">ax3</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">&#39;Original Image&#39;</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="n">fontsize</span><span class="p">)</span>
 <span class="n">ax3</span><span class="o">.</span><span class="n">axis</span><span class="p">(</span><span class="s1">&#39;off&#39;</span><span class="p">)</span>
 
-
 <span class="n">plt</span><span class="o">.</span><span class="n">subplots_adjust</span><span class="p">(</span><span class="n">left</span><span class="o">=</span><span class="mf">0.</span><span class="p">,</span> <span class="n">right</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">top</span><span class="o">=</span><span class="mf">0.9</span><span class="p">,</span> <span class="n">bottom</span><span class="o">=</span><span class="mf">0.</span><span class="p">)</span>
+
 
 <span class="c1"># Save Images to File so can compare results of various threshold values</span>
 <span class="n">settings</span> <span class="o">=</span> <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="s1">&#39;s-thresh-&#39;</span>      <span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s_thresh</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">s_thresh</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">+</span> \
            <span class="s1">&#39;_&#39;</span> <span class="o">+</span> <span class="s1">&#39;sobel-x-thresh-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">sx_thresh</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">+</span><span class="s1">&#39;-&#39;</span><span class="o">+</span><span class="nb">str</span><span class="p">(</span><span class="n">sx_thresh</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
 <span class="n">folder_name</span> <span class="o">=</span> <span class="s1">&#39;./l30-my-outputs-from-color_and_gradient/&#39;</span>
-<span class="n">bw_binary_filename</span>    <span class="o">=</span> <span class="n">folder_name</span><span class="o">+</span><span class="s1">&#39;l30_BW_binary&#39;</span>   <span class="o">+</span><span class="n">settings</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span>
+<span class="n">bw_binary_filename</span>    <span class="o">=</span> <span class="n">folder_name</span><span class="o">+</span><span class="s1">&#39;l30_bw3_binary&#39;</span>   <span class="o">+</span><span class="n">settings</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span>
 <span class="n">color_binary_filename</span> <span class="o">=</span> <span class="n">folder_name</span><span class="o">+</span><span class="s1">&#39;l30_color_binary&#39;</span><span class="o">+</span><span class="n">settings</span><span class="o">+</span><span class="s1">&#39;.png&#39;</span>
 
-<span class="c1"># create folder if it does not exist (from # https://stackoverflow.com/a/34119406/5411817)</span>
-<span class="c1"># from os import makedirs, path</span>
+
 <span class="kn">import</span> <span class="nn">os</span>
-<span class="c1"># from os import path</span>
-<span class="c1"># import distutils.dir_util</span>
-<span class="c1"># from pathlib import Path</span>
-
-<span class="c1"># # This &quot;works&quot;, except that the backslashes are escaped:</span>
-<span class="c1"># # &#39;S:\\Classes\\_Udacity_CarND\\Term1\\CarND-Advanced-Lane-Lines-Exercises\\&#39;</span>
-<span class="c1"># from inspect import getsourcefile</span>
-<span class="c1"># from os.path import abspath</span>
-<span class="c1"># script_dir = abspath(getsourcefile(lambda:0))</span>
-<span class="c1"># print(&quot;script dir: &quot;, script_dir)</span>
-
-<span class="c1"># If running from .py file, rather than from .ipynb, might need the following lines</span>
-<span class="c1"># this does NOT &quot;work&quot;: either an error, or an empty string results</span>
-<span class="c1"># script_dir = os.path.dirname(__file__)  # error</span>
-<span class="c1"># script_dir = os.path.dirname(&quot;&quot;)</span>
-<span class="c1"># print(&quot;script dir: &quot;, script_dir)        # &quot;&quot; (empty string) </span>
-<span class="c1"># images_path = os.path.join(script_dir, folder_name)</span>
 
 <span class="n">images_path</span> <span class="o">=</span> <span class="n">folder_name</span>      <span class="c1"># remove this line if uncommented above section, (not using notebook)</span>
 <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isdir</span><span class="p">(</span><span class="n">images_path</span><span class="p">):</span>
     <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">images_path</span><span class="p">)</span>
 
-<span class="c1"># TODO: only resave files if they don&#39;t already exist!</span>
-    
-<span class="c1"># save files (use mpimg, since color_result is in RGB order)</span>
 <span class="c1"># convert BW to 3 channels for saving</span>
 <span class="n">bw_3channel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros_like</span><span class="p">(</span><span class="n">color_result</span><span class="p">)</span>
 <span class="n">bw_3channel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">dstack</span><span class="p">((</span><span class="n">bw_result</span><span class="p">,</span> <span class="n">bw_result</span><span class="p">,</span> <span class="n">bw_result</span><span class="p">))</span>
+
+<span class="c1"># TODO: only resave files if they don&#39;t already exist!</span>
+    
+<span class="c1"># save files (use mpimg, since color_result is in RGB order)</span>
 <span class="n">mpimg</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">bw_binary_filename</span><span class="p">,</span> <span class="n">bw_3channel</span><span class="p">)</span>
 <span class="n">mpimg</span><span class="o">.</span><span class="n">imsave</span><span class="p">(</span><span class="n">color_binary_filename</span><span class="p">,</span> <span class="n">color_result</span><span class="p">)</span>
 
-<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Binary Thresholds images saved as: </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">combo_binary_filename</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">color_binary_filename</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">&#39;Binary Thresholds images saved as: </span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">bw_binary_filename</span> <span class="o">+</span> <span class="s1">&#39;</span><span class="se">\n</span><span class="s1">&#39;</span> <span class="o">+</span> <span class="n">color_binary_filename</span><span class="p">)</span>
 </pre></div>
 
 </div>
@@ -11944,11 +11891,8 @@ div#notebook {
 
 <div class="output_area"><div class="prompt"></div>
 <div class="output_subarea output_stream output_stdout output_text">
-<pre>(720, 1280) bw shape
-(720, 1280) bw shape
-(720, 1280) (720, 1280, 3) bw shape, color shape
-Binary Thresholds images saved as: 
-./l30-my-outputs-from-color_and_gradient/l30_BW_binary_s-thresh-90-255_sobel-x-thresh-20-100.png
+<pre>Binary Thresholds images saved as: 
+./l30-my-outputs-from-color_and_gradient/l30_bw3_binary_s-thresh-90-255_sobel-x-thresh-20-100.png
 ./l30-my-outputs-from-color_and_gradient/l30_color_binary_s-thresh-90-255_sobel-x-thresh-20-100.png
 </pre>
 </div>
