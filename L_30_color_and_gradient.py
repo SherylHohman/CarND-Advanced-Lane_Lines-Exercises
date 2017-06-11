@@ -10,22 +10,76 @@
 get_ipython().magic('matplotlib inline')
 
 
-# In[12]:
+# In[2]:
 
-## SET THRESHOLD VALUES HERE
+# ## SET THRESHOLD VALUES HERE
 
-s_thresh  = (, 255)  # (90, 255) were good values from L_29
-sx_thresh = (20, 100)
+# s_thresh  = (140, 255)  # (90, 255) were good values from L_29
+# sx_thresh = ( 20, 100)
 
 
-# In[13]:
+# In[3]:
 
 import numpy as np
 import cv2
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 
-image = mpimg.imread('bridge_shadow.jpg')
+def plot_results(orig_image, bw_result, color_result):
+    # how many images across and how many image rows
+    nrows = 3  #1
+    ncols = 1  #2
+    # figsize must be recalculated when change nrows and ncols
+    figsize = (12, 18) #1x2: (24,9)
+    # fonstsize is dependant on size of subplot
+    fontsize = 10 #40
+
+    # f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(24, 9))
+    f, (ax1, ax2, ax3) = plt.subplots(nrows, ncols, figsize=figsize)
+    f.tight_layout()
+
+    ax1.imshow(color_result)
+    ax1.set_title('BLUE: S-channel  |  GREEN: Sobel x-dir  | CYAN: both', fontsize=fontsize)
+    ax1.axis('off')
+
+    ax2.imshow(bw_result, cmap='gray')
+    ax2.set_title('S_thresh:'+str(s_thresh)+'  |  sobelx_thresh: '+str(sx_thresh), fontsize=fontsize)
+    ax2.axis('off')
+
+    ax3.imshow(orig_image)
+    ax3.set_title('Original Image', fontsize=fontsize)
+    ax3.axis('off')
+
+    plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
+    
+def save_results(bw_result, color_result):
+    
+    import os
+
+    # Save Images to File so can compare results of various threshold values
+    settings = '_' + 's-thresh-'      +str(s_thresh[0]) +'-'+str(s_thresh[1]) +                '_' + 'sobel-x-thresh-'+str(sx_thresh[0])+'-'+str(sx_thresh[1])
+    folder_name = './l30-my-outputs-from-color_and_gradient/'
+    bw_binary_filename    = folder_name+'l30_bw3_binary'   +settings+'.png'
+    color_binary_filename = folder_name+'l30_color_binary'+settings+'.png'
+
+    # create folder if it does not already exist
+    images_path = folder_name      # remove this line if uncommented above section, (not using notebook)
+    if not os.path.isdir(images_path):
+        os.makedirs(images_path)
+
+    # convert BW to 3 channels for saving
+    bw_3channel = np.zeros_like(color_result)
+    bw_3channel = np.dstack((bw_result, bw_result, bw_result))
+
+    # COULD DO: only resave files if they don't already exist!
+
+    # save files (use mpimg, since color_result is in RGB order)
+    mpimg.imsave(bw_binary_filename, bw_3channel)
+    mpimg.imsave(color_binary_filename, color_result)
+
+    print('Binary Thresholds images saved as: \n' + bw_binary_filename + '\n' + color_binary_filename)
+    
+
 
 def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
 # def pipeline(orig_image, s_thresh=(170, 255), sx_thresh=(20, 100)):
@@ -67,65 +121,22 @@ def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
     
     return color_binary, bw_binary 
     
-## If running within Udacity, Uncomment, and SET THRESHOLD VALUES HERE
-# s_thresh  = (170, 255) #(90, 255)  # These were good values from L_29
-# sx_thresh = ( 15, 100)
-# If running locally, SET THRESHOLD VALUES IN PREVIOUS CELL
     
+
+image = mpimg.imread('bridge_shadow.jpg')
+    
+# SET THRESHOLD VALUES HERE
+s_thresh  = (140, 255)  # (90, 255) were good values from L_29
+sx_thresh = ( 20, 100)
+    
+# calculate binary images, based on threshold values above
 color_result, bw_result = pipeline(image, s_thresh)
 
 # Plot the results
-# how many images across and how many image rows
-nrows = 3  #1
-ncols = 1  #2
-# figsize must be recalculated when change nrows and ncols
-figsize = (12, 18) #1x2: (24,9)
-# fonstsize is dependant on size of subplot
-fontsize = 10 #40
-
-# f, ((ax1, ax2), (ax3, ax4)) = plt.subplots(2, 2, figsize=(24, 9))
-f, (ax1, ax2, ax3) = plt.subplots(nrows, ncols, figsize=figsize)
-f.tight_layout()
-
-ax1.imshow(color_result)
-ax1.set_title('BLUE: S-channel  |  GREEN: Sobel x-dir  | CYAN: both', fontsize=fontsize)
-ax1.axis('off')
-
-ax2.imshow(bw_result, cmap='gray')
-ax2.set_title('S_thresh:'+str(s_thresh)+'  |  sobelx_thresh: '+str(sx_thresh), fontsize=fontsize)
-ax2.axis('off')
-
-ax3.imshow(image)
-ax3.set_title('Original Image', fontsize=fontsize)
-ax3.axis('off')
-
-plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
-
+plot_results(image, bw_result, color_result)
 
 # Save Images to File so can compare results of various threshold values
-settings = '_' + 's-thresh-'      +str(s_thresh[0]) +'-'+str(s_thresh[1]) +            '_' + 'sobel-x-thresh-'+str(sx_thresh[0])+'-'+str(sx_thresh[1])
-folder_name = './l30-my-outputs-from-color_and_gradient/'
-bw_binary_filename    = folder_name+'l30_bw3_binary'   +settings+'.png'
-color_binary_filename = folder_name+'l30_color_binary'+settings+'.png'
-
-
-import os
-
-images_path = folder_name      # remove this line if uncommented above section, (not using notebook)
-if not os.path.isdir(images_path):
-    os.makedirs(images_path)
-
-# convert BW to 3 channels for saving
-bw_3channel = np.zeros_like(color_result)
-bw_3channel = np.dstack((bw_result, bw_result, bw_result))
-
-# TODO: only resave files if they don't already exist!
-    
-# save files (use mpimg, since color_result is in RGB order)
-mpimg.imsave(bw_binary_filename, bw_3channel)
-mpimg.imsave(color_binary_filename, color_result)
-
-print('Binary Thresholds images saved as: \n' + bw_binary_filename + '\n' + color_binary_filename)
+save_results(bw_result, color_result)
 
 
 # In[ ]:
@@ -294,7 +305,7 @@ ax2.imshow(combined_binary, cmap='gray')
 
 # #### L_30 Start File:  
 
-# In[3]:
+# In[4]:
 
 import numpy as np
 import cv2
