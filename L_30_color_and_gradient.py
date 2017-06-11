@@ -10,7 +10,15 @@
 get_ipython().magic('matplotlib inline')
 
 
-# In[2]:
+# In[12]:
+
+## SET THRESHOLD VALUES HERE
+
+s_thresh  = (, 255)  # (90, 255) were good values from L_29
+sx_thresh = (20, 100)
+
+
+# In[13]:
 
 import numpy as np
 import cv2
@@ -59,9 +67,10 @@ def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
     
     return color_binary, bw_binary 
     
-## SET THRESHOLD VALUES HERE
-s_thresh  = (90, 255)  # These were good values from L_29
-sx_thresh = (20, 100)
+## If running within Udacity, Uncomment, and SET THRESHOLD VALUES HERE
+# s_thresh  = (170, 255) #(90, 255)  # These were good values from L_29
+# sx_thresh = ( 15, 100)
+# If running locally, SET THRESHOLD VALUES IN PREVIOUS CELL
     
 color_result, bw_result = pipeline(image, s_thresh)
 
