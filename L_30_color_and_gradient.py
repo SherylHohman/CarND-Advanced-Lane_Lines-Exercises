@@ -10,7 +10,7 @@
 get_ipython().magic('matplotlib inline')
 
 
-# In[2]:
+# In[13]:
 
 import numpy as np
 import cv2
@@ -88,17 +88,17 @@ def pipeline(img, s_thresh=(170, 255), sx_thresh=(20, 100)):
     
     # temp: just to see what it looks like
     # BW binary combination of sxbinary and s_binary (not using)
-    combined_binary = np.zeros_like(s_binary)
-    combined_binary[ (sxbinary == 1) | (s_binary == 1)] = 1
+    bw_binary = np.zeros_like(s_binary)
+    bw_binary[ (sxbinary == 1) | (s_binary == 1)] = 1
     #return combined_binary 
     
-    return color_binary, combined_binary 
+    return color_binary, bw_binary 
     
 ## SET THRESHOLD VALUES HERE
 s_thresh  = (90, 255)  # These were good values from L_29
 sx_thresh = (20, 100)
     
-color_result, BW_result = pipeline(image, s_thresh)
+color_result, bw_result = pipeline(image, s_thresh)
 
 # Plot the result
 
@@ -128,6 +128,48 @@ ax3.axis('off')
 
 
 plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
+
+# Save Images to File so can compare results of various threshold values
+settings = '_' + 's-thresh-'      +str(s_thresh[0]) +'-'+str(s_thresh[1]) +            '_' + 'sobel-x-thresh-'+str(sx_thresh[0])+'-'+str(sx_thresh[1])
+folder_name = './l30-my-outputs-from-color_and_gradient/'
+bw_binary_filename    = folder_name+'l30_BW_binary'   +settings+'.png'
+color_binary_filename = folder_name+'l30_color_binary'+settings+'.png'
+
+# create folder if it does not exist (from # https://stackoverflow.com/a/34119406/5411817)
+# from os import makedirs, path
+import os
+# from os import path
+# import distutils.dir_util
+# from pathlib import Path
+
+# # This "works", except that the backslashes are escaped:
+# # 'S:\\Classes\\_Udacity_CarND\\Term1\\CarND-Advanced-Lane-Lines-Exercises\\'
+# from inspect import getsourcefile
+# from os.path import abspath
+# script_dir = abspath(getsourcefile(lambda:0))
+# print("script dir: ", script_dir)
+
+# If running from .py file, rather than from .ipynb, might need the following lines
+# this does NOT "work": either an error, or an empty string results
+# script_dir = os.path.dirname(__file__)  # error
+# script_dir = os.path.dirname("")
+# print("script dir: ", script_dir)        # "" (empty string) 
+# images_path = os.path.join(script_dir, folder_name)
+
+images_path = folder_name      # remove this line if uncommented above section, (not using notebook)
+if not os.path.isdir(images_path):
+    os.makedirs(images_path)
+
+# TODO: only resave files if they don't already exist!
+    
+# save files (use mpimg, since color_result is in RGB order)
+# convert BW to 3 channels for saving
+bw_3channel = np.zeros_like(color_result)
+bw_3channel = np.dstack((bw_result, bw_result, bw_result))
+mpimg.imsave(bw_binary_filename, bw_3channel)
+mpimg.imsave(color_binary_filename, color_result)
+
+print('Binary Thresholds images saved as: \n' + combo_binary_filename + '\n' + color_binary_filename)
 
 
 # In[ ]:
