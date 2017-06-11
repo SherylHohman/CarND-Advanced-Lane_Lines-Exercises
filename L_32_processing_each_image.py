@@ -9,11 +9,12 @@
 get_ipython().magic('matplotlib inline')
 
 
-# In[ ]:
+# In[2]:
 
 # Some Helper Functions
 
-def create_folder_if_not_exits(folder_name):
+def create_folder_if_not_exists(folder_name):
+    import os   
     # May need to update this function if not running within Jupyter notebook, or running in different OS
     if not os.path.isdir(folder_name):
         os.makedirs(folder_name)
@@ -46,7 +47,7 @@ def create_folder_if_not_exits(folder_name):
 
 #  #### Pickle the objpoints and imgpoints for each image
 
-# In[ ]:
+# In[3]:
 
 # Here are the steps to pickle the objpoints and imgpoints for each image
 
@@ -55,7 +56,6 @@ import cv2
 import glob
 import pickle
 import matplotlib.pyplot as plt
-get_ipython().magic('matplotlib qt')
 
 # Chessboard has 8 inner corners across
 #                6 inner corners vertical
@@ -95,14 +95,14 @@ for idx, fname in enumerate(images):
         # Draw and display the corners (not required)
         cv2.drawChessboardCorners(img, (8,6), corners, ret)
         cv2.imshow('img', img)
-        cv2.waitKey(500)
+#         cv2.waitKey(30)
 
 cv2.destroyAllWindows()
         
 # save objpoints and imgpoints to pickle file
 objpoints_pickle = {}
 objpoints_pickle["objpoints"] = objpoints
-objpoints_pickle["imgpoints"] = imgpoints
+objpoints_pickle["imgpoints"] = imgpoints 
 
 folder_name = "l32/"
 file_name   = "wide_objpoints_pickle.p"
@@ -110,21 +110,22 @@ create_folder_if_not_exists(folder_name)
 with open( folder_name+file_name, "wb" ) as f:
     pickle.dump( objpoints_pickle, f )
     
-print("Imgpoints and Objpoints have been saved to 'calibration_wide/wide_objpoints_pickle.p'")
+print("Imgpoints and Objpoints have been saved to", folder_name+file_name)
 
 
 # #### Read objpoints and imgpoints from pickle file
 
-# In[ ]:
+# In[4]:
 
-import pickle
+# import pickle
 
 # Read objpoints and imgpoints from pickle file
-objpoints_pickle = pickle.load( open( "l32/wide_objpoints_pickle.p", "rb" ) )
+pickled_path = "l32/wide_objpoints_pickle.p"
+objpoints_pickle = pickle.load( open( pickled_path, "rb" ) )
 objpoints = objpoints_pickle["objpoints"]
 imgpoints = objpoints_pickle["imgpoints"]
 
-print("Imgpoints and Objpoints have been read in from 'calibration_wide/wide_objpoints_pickle.p'")
+print("Imgpoints and Objpoints have been read in from " + pickled_path)
 
 
 # #### Part 1-2: Callibrate and Undistort Images
@@ -135,9 +136,10 @@ print("Imgpoints and Objpoints have been read in from 'calibration_wide/wide_obj
 #    - **cv2.undistort**  
 # 
 
-# In[ ]:
+# In[5]:
 
 import cv2
+import pickle
 
 # takes in: an image, chessboard grid object points, image's image points (as meassured by findChessboardCorners)
 #    - performs the camera calibration (mathematically correlate imgpoints to objpoints), 
@@ -152,6 +154,20 @@ def cal_undistort(img, objpoints, imgpoints):
     
     # Calibrate imgpoints to the objpoints
     ret, mtx, dist, rvecs, tvecs = cv2.calibrateCamera(objpoints, imgpoints, shape, None, None)
+    
+    # save mtx and dist to pickle file
+    dist_mtx_pickle = {}
+    dist_mtx_pickle["dist"] = dist
+    dist_mtx_pickle["mtx"]  = mtx
+
+    folder_name = "l32/"
+    file_name   = "wide_dist_mtx_pickle.p"
+    create_folder_if_not_exists(folder_name)
+    with open( folder_name+file_name, "wb" ) as f:
+        pickle.dump( dist_mtx_pickle, f )
+
+    print("\n calibration 'dist' and 'mtx' have been saved to", folder_name+file_name, "\n")
+    
     
     # Undistort the image
     undist = cv2.undistort(img, mtx, dist, None, mtx)
@@ -175,7 +191,7 @@ def cal_undistort(img, objpoints, imgpoints):
 # Currently, it displays a before and after only for a single image (==first image that was stored in imgpoints array)  
 # 
 
-# In[ ]:
+# In[6]:
 
 import numpy as np
 import matplotlib.pyplot as plt
@@ -215,7 +231,7 @@ plt.subplots_adjust(left=0., right=1, top=0.9, bottom=0.)
 # ## 2 - Thresholding
 # ###### (See L_21, L_22, L_24, L_29 for more details)
 
-# In[6]:
+# In[7]:
 
 import numpy as np
 import cv2
@@ -255,15 +271,12 @@ def save_results(bw_result, color_result):
 
     # Save Images to File so can compare results of various threshold values
     settings = '_' + 's-thresh-'      +str(s_thresh[0]) +'-'+str(s_thresh[1]) +                '_' + 'sobel-x-thresh-'+str(sx_thresh[0])+'-'+str(sx_thresh[1])
+        
     folder_name = './l32-my-outputs-from-color_and_gradient/'
+    create_folder_if_not_exists(folder_name)
+
     bw_binary_fullpath    = folder_name+'l32_bw_binary'   +settings+'.png'
     color_binary_fullpath = folder_name+'l32_color_binary'+settings+'.png'
-
-#     # create folder if it does not already exist
-#     images_path = folder_name      # remove this line if uncommented above section, (not using notebook)
-#     if not os.path.isdir(images_path):
-#         os.makedirs(images_path)
-    create_folder_if_not_exists(folder_name)
 
     # convert BW to 3 channels for saving
     bw_3channel = np.zeros_like(color_result)
@@ -345,7 +358,7 @@ save_results(bw_result, color_result)
 # ## 3 - Perspective Transform
 # ###### (See L_17 for more details)
 
-# In[ ]:
+# In[8]:
 
 import pickle
 import cv2
@@ -355,9 +368,9 @@ import matplotlib.image  as mpimg
 
 # Read in the saved camera matrix and distortion coefficients
 # These are the arrays calculated above from cv2.calibrateCamera()
-dist_pickle = pickle.load( open( "l32/wide_dist_pickle.p", "rb" ) )
-mtx  = dist_pickle["mtx"]
+dist_pickle = pickle.load( open( "l32/wide_dist_mtx_pickle.p", "rb" ) )
 dist = dist_pickle["dist"]
+mtx  = dist_pickle["mtx"]
 
 
 # Read in an image
